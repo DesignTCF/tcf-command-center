@@ -1,8 +1,25 @@
+# Credentials — NEVER commit
 .env
-*.env
+*.env.local
+
+# Dependencies
 node_modules/
+server/node_modules/
+client/node_modules/
+
+# Build output
 client-dist/
-client/
-server/
-data/
-.github/
+client/.vite/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
