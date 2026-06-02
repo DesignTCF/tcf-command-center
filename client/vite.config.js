@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const isGhPages = process.env.GH_PAGES === 'true'
+
 export default defineConfig({
-  base: '/tcf-command-center/',
+  base: isGhPages ? '/tcf-command-center/' : '/',
   plugins: [react()],
   server: {
     port: 5173,
@@ -14,7 +16,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../client-dist',
+    outDir: isGhPages ? '../client-dist-gh' : '../client-dist',
     emptyOutDir: true,
   },
 })
