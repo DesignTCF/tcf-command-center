@@ -1,0 +1,46 @@
+[
+  {
+    "id": "sup-chunbai",
+    "supplier": "Chunbai (Doria Wang)",
+    "project": "Daily Rou — Black Glass Bottles",
+    "waitingOn": "Confirm dieline approval for SPF-50 airless container",
+    "lastContact": "2026-05-28",
+    "nextFollowUp": "2026-06-05",
+    "status": "Waiting",
+    "notes": "Primary packaging supplier. All Daily Rou completed. SPF-50 and Nitt Beauty samples pending approval.",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "sup-ybs",
+    "supplier": "Your Box Solution",
+    "project": "Daily Rou — Labels + Boxes",
+    "waitingOn": "Nothing — all Daily Rou orders complete",
+    "lastContact": "2026-05-11",
+    "nextFollowUp": "",
+    "status": "Complete",
+    "notes": "All 4 Daily Rou SKUs completed and received 5/11/2026. Nitt Beauty boxes queued when artwork ready.",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "sup-chunbai-nitt",
+    "supplier": "Chunbai (Doria Wang)",
+    "project": "Nitt Beauty — Glass Square Bottles",
+    "waitingOn": "Client approval on bottle samples (3 of 4 received)",
+    "lastContact": "2026-05-20",
+    "nextFollowUp": "2026-06-08",
+    "status": "Waiting",
+    "notes": "Samples received for HA Serum, Cream Cleanser, Gel Cleanser. Face Cream sample outstanding.",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "sup-chunbai-nevoo",
+    "supplier": "Chunbai (Doria Wang)",
+    "project": "NeVoo — LDPE Boston Round Print",
+    "waitingOn": "Print samples for 8oz and 2oz bottles",
+    "lastContact": "2026-05-30",
+    "nextFollowUp": "2026-06-10",
+    "status": "In Progress",
+    "notes": "Print samples for silkscreen + gold hot stamp in production. Expected delivery mid-June.",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  }
+]

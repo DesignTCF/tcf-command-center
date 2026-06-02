@@ -1,0 +1,50 @@
+[
+  {
+    "id": "a1",
+    "supplierName": "Zhejiang Poya Co.",
+    "supplierUrl": "https://www.alibaba.com",
+    "product": "30ml Frosted Glass Dropper Bottle",
+    "productType": "Bottle",
+    "status": "Waiting Reply",
+    "quotedPrice": "$0.28",
+    "moq": "1,000",
+    "leadTime": "8 weeks",
+    "lastContactDate": "2026-05-28",
+    "followUpDate": "2026-06-05",
+    "lastMessage": "Thank you for your inquiry. We are checking stock availability and will reply soon.",
+    "notes": "Good reviews, MOQ flexible. Compare with Chunbai pricing.",
+    "createdAt": "2026-05-28T09:00:00.000Z"
+  },
+  {
+    "id": "a2",
+    "supplierName": "Guangzhou Meisheng",
+    "supplierUrl": "https://www.alibaba.com",
+    "product": "15ml Airless Pump Jar — Eye Cream",
+    "productType": "Jar",
+    "status": "Quoted",
+    "quotedPrice": "$0.42",
+    "moq": "2,000",
+    "leadTime": "10 weeks",
+    "lastContactDate": "2026-06-01",
+    "followUpDate": "2026-06-08",
+    "lastMessage": "Unit price: $0.42 at MOQ 2,000. $0.38 at 5,000 units. Samples $5 each + freight. Lead time 10-12 weeks.",
+    "notes": "Price is high. Counter-offer at $0.35 for 3,000 units?",
+    "createdAt": "2026-05-20T09:00:00.000Z"
+  },
+  {
+    "id": "a3",
+    "supplierName": "Shenzhen Bottle King",
+    "supplierUrl": "https://www.alibaba.com",
+    "product": "50ml Amber Glass Dropper — Retinol",
+    "productType": "Bottle",
+    "status": "Sample Requested",
+    "quotedPrice": "$0.31",
+    "moq": "500",
+    "leadTime": "6 weeks",
+    "lastContactDate": "2026-05-30",
+    "followUpDate": "2026-06-07",
+    "lastMessage": "Sample shipped via DHL tracking: 1234567890. Expected delivery June 5-7.",
+    "notes": "For Vela Wellness retinol project. Low MOQ is perfect.",
+    "createdAt": "2026-05-25T09:00:00.000Z"
+  }
+]

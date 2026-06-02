@@ -1,0 +1,58 @@
+[
+  {
+    "id": "d-nevoo-shampoo",
+    "title": "NeVoo Shampoo — finalize formula brief + bottle",
+    "context": "6 SKUs (Retail, Back Bar, Travel x Shampoo + Conditioner) all at Decision Pending/Sourcing. Back bar options: 32oz or 64oz bag. Need formula brief from Molly Smith before development can start.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-devman-bottle",
+    "title": "Devoted Man — select bottle for Beard Scrub",
+    "context": "Formula FML-51-ly957 in progress. No bottle decision made yet. Chunbai is default supplier — need to spec container type, size, and closure before artwork can start.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-dailyrou-spf",
+    "title": "Daily Rou SPF-50 — source airless container",
+    "context": "Formula in progress (FML-51-ly946), bottle at Decision Pending/Sourcing. Airless container 50ml needed. Chunbai is likely supplier — need to confirm spec and place sample order.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-dailyrou-mystery",
+    "title": "Daily Rou — identify product for FML-51-ly945 (120ml black glass pump)",
+    "context": "A 120ml black glass pump bottle + FML-51-ly945 formula appear in the tracker with no product name assigned. Need to confirm with Meredith what product this is for.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-nitt-artwork",
+    "title": "Nitt Beauty — begin artwork once bottle samples approved",
+    "context": "Samples received on 3 of 4 SKUs. Glass square 30ml, cap 24-410. Once Gamze approves bottle samples, artwork can start. Silkscreen print via Chunbai, boxes via Your Box Solution.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-salt-packaging",
+    "title": "Salt Spa Yoga — start packaging sourcing for 6 SKUs",
+    "context": "Formulas assigned (ly950–955), but no bottle, closure, or print decisions made. Andrew Moss needs to be looped in. 5 sugar scrubs + 1 massage oil need different container types.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "d-nevoo-print",
+    "title": "NeVoo 32oz Back Bar — confirm label print decision",
+    "context": "8oz and 2oz are silkscreen (matte soft touch + gold hot stamp). 32oz Back Bar label shows 'In Progress' but no finish or supplier confirmed. Likely same spec as retail — confirm with Molly.",
+    "dueDate": "",
+    "resolved": false,
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  }
+]

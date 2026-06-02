@@ -1,0 +1,138 @@
+[
+  {
+    "id": "p-nevoo-1",
+    "name": "Reset: Micro-Exfoliant Scalp Scrub — 8oz Retail",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "UPC: 860014943805. Formula complete. Bottle ordered (LDPE Boston Round 240ml). Print job: silkscreen, matte soft-touch + gold hot stamp. Chunbai/Doria Wang.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nevoo-2",
+    "name": "Reset: Micro-Exfoliant Scalp Scrub — 32oz Back Bar",
+    "brand": "TCF Client",
+    "status": "Approved",
+    "notes": "UPC: 860014943829. Formula complete. Bottle delivered. Label: in progress.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nevoo-3",
+    "name": "Reset: Micro-Exfoliant Scalp Scrub — 2oz Travel",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "UPC: 860014943812. Formula complete. Bottle ordered (LDPE Boston Round 30ml). Silkscreen complete.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nevoo-4",
+    "name": "NeVoo Shampoo — Retail / Back Bar / Travel",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "3 SKUs. Formula and bottle both Decision Pending/Sourcing. 32 or 64oz bag options for back bar.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nevoo-5",
+    "name": "NeVoo Conditioner — Retail / Back Bar / Travel",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "3 SKUs. Formula and bottle both Decision Pending/Sourcing.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-devman-1",
+    "name": "Devoted Man — Beard Scrub",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "Client: Josh Smith. Formula FML-51-ly957 in progress. Bottle sourcing from Chunbai.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-dailyrou-1",
+    "name": "Daily Rou — Essential C (THD 30% Serum)",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "Client: Meredith Baurband. FML-51-ly946. Black glass 30ml dropper. Label: BOPP Gloss. Box: 19pt matte soft-touch. Both completed 5/11/2026. 250 units.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-dailyrou-2",
+    "name": "Daily Rou — Hydrating Cream Cleanser",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "FML-51-ly947. Black glass 200ml. Label + box both completed 5/11/2026. 250 units. Ready to ship.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-dailyrou-3",
+    "name": "Daily Rou — Gentle Cleansing Oil",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "FML-51-ly948. Black glass 200ml, 4 fl oz. Label + box completed 5/11/2026. 250 units.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-dailyrou-4",
+    "name": "Daily Rou — Brightening Cleansing Gel",
+    "brand": "TCF Client",
+    "status": "Ready",
+    "notes": "FML-51-ly949. Black glass 200ml. Label + box completed 5/11/2026. 250 units.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-dailyrou-5",
+    "name": "Daily Rou — SPF-50 Mineral Sunscreen",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "FML-51-ly946. Airless container 50ml. Bottle Decision Pending/Sourcing. Airless pump closure.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nitt-1",
+    "name": "Nitt Beauty — Hyaluronic Acid Serum",
+    "brand": "TCF Client",
+    "status": "Stability Testing",
+    "notes": "Client: Gamze Gurlevik. FML-21-Hy743. Glass square 30ml, samples received. Silkscreen print.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nitt-2",
+    "name": "Nitt Beauty — Cream Cleanser",
+    "brand": "TCF Client",
+    "status": "Stability Testing",
+    "notes": "FML-21-Hy743. Glass square 30ml, samples received.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nitt-3",
+    "name": "Nitt Beauty — Face Cream",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "FML-21-Hy743. Glass square 30ml. Bottle sourcing Chunbai.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-nitt-4",
+    "name": "Nitt Beauty — Gel Cleanser",
+    "brand": "TCF Client",
+    "status": "Stability Testing",
+    "notes": "FML-21-Hy743. Glass square 30ml, samples received.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-salt-1",
+    "name": "Salt Spa Yoga — Massage Oil",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "Client: Andrew Moss. FML-51-ly951. Bottle sourcing in progress.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "p-salt-2",
+    "name": "Salt Spa Yoga — Sugar Scrubs (x5 scents)",
+    "brand": "TCF Client",
+    "status": "In Development",
+    "notes": "FML-51-ly950/952/953/954/955. 5 SKUs. Bottle and label sourcing pending.",
+    "createdAt": "2025-01-01T09:00:00.000Z"
+  }
+]

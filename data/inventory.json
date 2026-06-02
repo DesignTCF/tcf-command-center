@@ -1,0 +1,62 @@
+[
+  {
+    "id": "inv-dailyrou-serum-bottles",
+    "name": "Black Glass Dropper 30ml (Daily Rou Essential C)",
+    "type": "Packaging",
+    "currentStock": 250,
+    "reorderPoint": 50,
+    "supplier": "Chunbai (Doria Wang)",
+    "leadTime": "8 weeks",
+    "unit": "units",
+    "notes": "Dedicated to Daily Rou Essential C. Labels applied.",
+    "createdAt": "2026-05-11T09:00:00.000Z"
+  },
+  {
+    "id": "inv-dailyrou-cleanser-bottles",
+    "name": "Black Glass 200ml (Daily Rou Cleansers x3)",
+    "type": "Packaging",
+    "currentStock": 750,
+    "reorderPoint": 100,
+    "supplier": "Chunbai (Doria Wang)",
+    "leadTime": "8 weeks",
+    "unit": "units",
+    "notes": "Shared across 3 cleanser SKUs. 250 per SKU.",
+    "createdAt": "2026-05-11T09:00:00.000Z"
+  },
+  {
+    "id": "inv-nevoo-8oz",
+    "name": "LDPE Boston Round 240ml — NeVoo 8oz",
+    "type": "Packaging",
+    "currentStock": 0,
+    "reorderPoint": 500,
+    "supplier": "Chunbai (Doria Wang)",
+    "leadTime": "10 weeks",
+    "unit": "units",
+    "notes": "Ordered. Awaiting print samples before production run of 5,000.",
+    "createdAt": "2026-05-15T09:00:00.000Z"
+  },
+  {
+    "id": "inv-nevoo-2oz",
+    "name": "LDPE Boston Round 30ml — NeVoo 2oz Travel",
+    "type": "Packaging",
+    "currentStock": 0,
+    "reorderPoint": 500,
+    "supplier": "Chunbai (Doria Wang)",
+    "leadTime": "10 weeks",
+    "unit": "units",
+    "notes": "Same print run as 8oz. Samples pending.",
+    "createdAt": "2026-05-15T09:00:00.000Z"
+  },
+  {
+    "id": "inv-nitt-glass-square",
+    "name": "Glass Square 30ml — Nitt Beauty",
+    "type": "Packaging",
+    "currentStock": 0,
+    "reorderPoint": 100,
+    "supplier": "Chunbai (Doria Wang)",
+    "leadTime": "8 weeks",
+    "unit": "units",
+    "notes": "Samples received. Awaiting client approval before production order.",
+    "createdAt": "2026-05-20T09:00:00.000Z"
+  }
+]

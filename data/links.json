@@ -1,0 +1,203 @@
+[
+  {
+    "id": "l1", "title": "Adobe", "url": "https://auth.services.adobe.com/", "username": "design@paulyinc.com", "category": "Design"
+  },
+  {
+    "id": "l2", "title": "Adobe", "url": "https://auth.services.adobe.com/", "username": "pauly@paulyinc.com", "category": "Design"
+  },
+  {
+    "id": "l3", "title": "Adobe", "url": "https://auth.services.adobe.com/", "username": "sales@thecosmeticformulary.com", "category": "Design"
+  },
+  {
+    "id": "l4", "title": "Freepik", "url": "https://id.freepik.com/", "username": "design@paulyinc.com", "category": "Design"
+  },
+  {
+    "id": "l5", "title": "Kive.ai", "url": "https://kive.ai/", "username": "design@paulyinc.com", "category": "Design"
+  },
+  {
+    "id": "l6", "title": "Kive.ai", "url": "https://kive.ai/", "username": "design@thecosmeticformulary.com", "category": "Design"
+  },
+  {
+    "id": "l7", "title": "Envato Elements", "url": "https://elements.envato.com/", "username": "office@paulyinc.com", "category": "Design"
+  },
+  {
+    "id": "l8", "title": "Fiverr Pro (NeVoo)", "url": "https://pro.fiverr.com/", "username": "info@nevoohair.com", "category": "Design"
+  },
+  {
+    "id": "l9", "title": "Fiverr", "url": "https://fiverr.com/", "username": "teampaulyinc@gmail.com", "category": "Design"
+  },
+  {
+    "id": "l10", "title": "Alibaba Login", "url": "https://login.alibaba.com/", "username": "paulyliebs@gmail.com", "category": "Suppliers"
+  },
+  {
+    "id": "l11", "title": "Alibaba Cashier", "url": "https://cashier.alibaba.com/", "username": "paulyliebs@gmail.com", "category": "Suppliers"
+  },
+  {
+    "id": "l12", "title": "Bulk Apothecary", "url": "https://bulkapothecary.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l13", "title": "Making Cosmetics", "url": "https://makingcosmetics.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l14", "title": "Wholesale Supplies Plus", "url": "https://wholesalesuppliesplus.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l15", "title": "Spectrum Chemical", "url": "https://spectrumchemical.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l16", "title": "Container & Packaging", "url": "https://containerandpackaging.com/", "username": "paulyworkmail@gmail.com", "category": "Suppliers"
+  },
+  {
+    "id": "l17", "title": "Custom Essence", "url": "https://customer.customessence.com/", "username": "office@paulyinc.com", "category": "Suppliers"
+  },
+  {
+    "id": "l18", "title": "McKernan", "url": "https://mckernan.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l19", "title": "OpenTip", "url": "https://opentip.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l20", "title": "Uline", "url": "https://uline.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l21", "title": "Tapstitch", "url": "https://tapstitch.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l22", "title": "Knowde", "url": "https://knowde.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l23", "title": "Tablecloth Factory", "url": "https://tableclothsfactory.com/", "username": "sales@thecosmeticformulary.com", "category": "Suppliers"
+  },
+  {
+    "id": "l24", "title": "GS1 US (Barcodes)", "url": "https://login.gs1us.org/", "username": "1111", "category": "Suppliers"
+  },
+  {
+    "id": "l25", "title": "Shopify (TCF)", "url": "https://accounts.shopify.com/", "username": "office@paulyinc.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l26", "title": "Shopify (NeVoo)", "url": "https://accounts.shopify.com/", "username": "info@nevoohair.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l27", "title": "Shopify Store (Clean Beauty Labs)", "url": "https://clean-beauty-labs-3.myshopify.com/", "username": "office@paulyinc.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l28", "title": "Amazon", "url": "https://amazon.com/", "username": "sales@thecosmeticformulary.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l29", "title": "eBay", "url": "https://signin.ebay.com/", "username": "sales@thecosmeticformulary.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l30", "title": "Etsy (TCF)", "url": "https://etsy.com/", "username": "sales@thecosmeticformulary.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l31", "title": "Etsy (Nicole)", "url": "https://etsy.com/", "username": "tcfformulation.nicolem@gmail.com", "category": "E-Commerce"
+  },
+  {
+    "id": "l32", "title": "HubSpot", "url": "https://app.hubspot.com/", "username": "office@paulyinc.com", "category": "Business"
+  },
+  {
+    "id": "l33", "title": "QuickBooks (Intuit)", "url": "https://accounts.intuit.com/", "username": "sales@thecosmeticformulary.com", "category": "Business"
+  },
+  {
+    "id": "l34", "title": "Odoo (Pauly)", "url": "https://pauly.odoo.com/", "username": "office@paulyinc.com", "category": "Business"
+  },
+  {
+    "id": "l35", "title": "Odoo (Pauly1)", "url": "https://pauly1.odoo.com/", "username": "office@paulyinc.com", "category": "Business"
+  },
+  {
+    "id": "l36", "title": "Craftybase", "url": "https://craftybase.com/", "username": "sales@thecosmeticformulary.com", "category": "Business"
+  },
+  {
+    "id": "l37", "title": "inFlow Inventory", "url": "https://accounts.inflowinventory.com/", "username": "sales@thecosmeticformulary.com", "category": "Business"
+  },
+  {
+    "id": "l38", "title": "The Hartford (Insurance)", "url": "https://account.thehartford.com/", "username": "sales@thecosmeticformulary.com", "category": "Business"
+  },
+  {
+    "id": "l39", "title": "UL (Safety / Compliance)", "url": "https://login.ul.com/", "username": "Lieber", "category": "Business"
+  },
+  {
+    "id": "l40", "title": "Uniqode (QR Codes)", "url": "https://auth.uniqode.com/", "username": "The Cosmetic Formulary", "category": "Business"
+  },
+  {
+    "id": "l41", "title": "Microsoft / Office 365", "url": "https://login.microsoftonline.com/", "username": "office@paulyinc.com", "category": "Business"
+  },
+  {
+    "id": "l42", "title": "Dropbox (Design)", "url": "https://dropbox.com/", "username": "design@thecosmeticformulary.com", "category": "Business"
+  },
+  {
+    "id": "l43", "title": "Dropbox (Office)", "url": "https://dropbox.com/", "username": "office@paulyinc.com", "category": "Business"
+  },
+  {
+    "id": "l44", "title": "Google (Katherine / Design)", "url": "https://accounts.google.com/", "username": "tcfdesign.katherinefox@gmail.com", "category": "Google"
+  },
+  {
+    "id": "l45", "title": "Google (design@thecosmeticformulary.com)", "url": "https://accounts.google.com/", "username": "design@thecosmeticformulary.com", "category": "Google"
+  },
+  {
+    "id": "l46", "title": "Google (sales@thecosmeticformulary.com)", "url": "https://accounts.google.com/", "username": "sales@thecosmeticformulary.com", "category": "Google"
+  },
+  {
+    "id": "l47", "title": "Google (formulary@thecosmeticformulary.com)", "url": "https://accounts.google.com/", "username": "formulary@thecosmeticformulary.com", "category": "Google"
+  },
+  {
+    "id": "l48", "title": "Google (design@paulyinc.com)", "url": "https://accounts.google.com/", "username": "design@paulyinc.com", "category": "Google"
+  },
+  {
+    "id": "l49", "title": "Google (marketing@paulyinc.com)", "url": "https://accounts.google.com/", "username": "marketing@paulyinc.com", "category": "Google"
+  },
+  {
+    "id": "l50", "title": "Google (office@paulyinc.com)", "url": "https://accounts.google.com/", "username": "office@paulyinc.com", "category": "Google"
+  },
+  {
+    "id": "l51", "title": "Google (Nicole M)", "url": "https://accounts.google.com/", "username": "tcfformulation.nicolem@gmail.com", "category": "Google"
+  },
+  {
+    "id": "l52", "title": "Google (Small Batch Print)", "url": "https://accounts.google.com/", "username": "orders@smallbatchprint.co", "category": "Google"
+  },
+  {
+    "id": "l53", "title": "Google (Team Pauly)", "url": "https://accounts.google.com/", "username": "teampaulyinc@gmail.com", "category": "Google"
+  },
+  {
+    "id": "l54", "title": "Instagram (Clean Beauty Labs)", "url": "https://instagram.com/", "username": "Cleanbeautylabs", "category": "Social"
+  },
+  {
+    "id": "l55", "title": "Instagram (Pauly Inc)", "url": "https://instagram.com/", "username": "Pauly__inc", "category": "Social"
+  },
+  {
+    "id": "l56", "title": "Pinterest", "url": "https://www.pinterest.com/", "username": "marketing@paulyinc.com", "category": "Social"
+  },
+  {
+    "id": "l57", "title": "Spotify", "url": "http://open.spotify.com/", "username": "sales@thecosmeticformulary.com", "category": "Social"
+  },
+  {
+    "id": "l58", "title": "Zoom (TCF)", "url": "https://zoom.us/", "username": "sales@thecosmeticformulary.com", "category": "Communication"
+  },
+  {
+    "id": "l59", "title": "MyFax", "url": "https://central.myfax.com/", "username": "18433262959", "category": "Communication"
+  },
+  {
+    "id": "l60", "title": "Ezeep (Printing)", "url": "https://id.ezeep.com/", "username": "office@paulyinc.com", "category": "Communication"
+  },
+  {
+    "id": "l61", "title": "ChatBot.app", "url": "https://chat.chatbot.app/", "username": "theskinaxis@gmail.com", "category": "AI Tools"
+  },
+  {
+    "id": "l62", "title": "OpenAI / ChatGPT", "url": "https://auth.openai.com/", "username": "office@paulyinc.com", "category": "AI Tools"
+  },
+  {
+    "id": "l63", "title": "DeepSeek", "url": "https://chat.deepseek.com/", "username": "sales@thecosmeticformulary.com", "category": "AI Tools"
+  },
+  {
+    "id": "l64", "title": "Bambu Lab Wiki", "url": "https://wiki.bambulab.com/", "username": "office@paulyinc.com", "category": "Equipment"
+  },
+  {
+    "id": "l65", "title": "Bambu Lab", "url": "https://bambulab.com/", "username": "office@paulyinc.com", "category": "Equipment"
+  },
+  {
+    "id": "l66", "title": "Staples", "url": "https://identity.staples.com/", "username": "sales@thecosmeticformulary.com", "category": "Equipment"
+  },
+  {
+    "id": "l67", "title": "Yardi Kube (Office)", "url": "https://20111ventu.yardikube.com/", "username": "design@paulyinc.com", "category": "Equipment"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "po-dailyrou-bottles",
+    "type": "PO",
+    "supplier": "Chunbai (Doria Wang)",
+    "product": "Black Glass Dropper 30ml — Daily Rou Essential C",
+    "quantity": 250,
+    "cost": 187.50,
+    "status": "Received",
+    "date": "2026-04-01",
+    "notes": "Received and in inventory.",
+    "createdAt": "2026-04-01T09:00:00.000Z"
+  },
+  {
+    "id": "po-dailyrou-boxes",
+    "type": "PO",
+    "supplier": "Your Box Solution",
+    "product": "Labels + Boxes — Daily Rou 4 SKUs",
+    "quantity": 1000,
+    "cost": 1250.00,
+    "status": "Received",
+    "date": "2026-05-11",
+    "notes": "All 4 SKUs completed and received 5/11/2026.",
+    "createdAt": "2026-04-15T09:00:00.000Z"
+  },
+  {
+    "id": "po-nevoo-print",
+    "type": "Production Order",
+    "supplier": "Chunbai (Doria Wang)",
+    "product": "NeVoo Scalp Scrub Bottles + Silkscreen Print (8oz + 2oz)",
+    "quantity": 5000,
+    "cost": 0,
+    "status": "In Progress",
+    "date": "2026-05-15",
+    "notes": "Print samples expected mid-June. Full production post sample approval.",
+    "createdAt": "2026-05-15T09:00:00.000Z"
+  },
+  {
+    "id": "rfq-devman-bottle",
+    "type": "RFQ",
+    "supplier": "Chunbai (Doria Wang)",
+    "product": "Devoted Man Beard Scrub — Container TBD",
+    "quantity": 0,
+    "cost": 0,
+    "status": "Pending",
+    "date": "2026-06-01",
+    "notes": "Waiting on formula completion and bottle spec decision before RFQ can be sent.",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "rfq-salt-packaging",
+    "type": "RFQ",
+    "supplier": "TBD",
+    "product": "Salt Spa Yoga — 6 SKU Containers",
+    "quantity": 0,
+    "cost": 0,
+    "status": "Pending",
+    "date": "2026-06-01",
+    "notes": "Need client brief on packaging aesthetic before RFQ. Sugar scrubs + massage oil.",
+    "createdAt": "2026-06-01T09:00:00.000Z"
+  }
+]

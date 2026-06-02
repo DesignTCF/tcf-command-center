@@ -1,0 +1,58 @@
+[
+  {
+    "id": "c-molly",
+    "name": "Molly Smith",
+    "brand": "NeVoo",
+    "role": "Client / Brand Owner",
+    "email": "",
+    "notes": "Scalp Scrub line (3 SKUs complete). Shampoo + Conditioner next. Bottle supplier: Chunbai/Doria Wang."
+  },
+  {
+    "id": "c-josh",
+    "name": "Josh Smith",
+    "brand": "Devoted Man",
+    "role": "Client / Brand Owner",
+    "email": "",
+    "notes": "Beard Scrub formula in progress. FML-51-ly957."
+  },
+  {
+    "id": "c-meredith",
+    "name": "Meredith Baurband",
+    "brand": "Daily Rou",
+    "role": "Client / Brand Owner",
+    "email": "",
+    "notes": "4 SKUs complete + ready (Essential C, Cream Cleanser, Oil Cleanser, Gel Cleanser). SPF-50 and 1 more TBD in progress. All packaging via Chunbai + Your Box Solution."
+  },
+  {
+    "id": "c-gamze",
+    "name": "Gamze Gurlevik",
+    "brand": "Nitt Beauty",
+    "role": "Client / Brand Owner",
+    "email": "",
+    "notes": "4 SKUs in progress — HA Serum, Cream Cleanser, Face Cream, Gel Cleanser. Glass square 30ml. Samples received. FML-21-Hy743."
+  },
+  {
+    "id": "c-andrew",
+    "name": "Andrew Moss",
+    "brand": "Salt Spa Yoga",
+    "role": "Client / Brand Owner",
+    "email": "",
+    "notes": "6 SKUs — 5 Sugar Scrubs + 1 Massage Oil. Formulas FML-51-ly950-955. Bottle sourcing pending."
+  },
+  {
+    "id": "c-doria",
+    "name": "Doria Wang",
+    "brand": "Chunbai",
+    "role": "Packaging Supplier",
+    "email": "",
+    "notes": "Primary packaging supplier for most client projects. Handles bottles, closures, dielines. Based in China."
+  },
+  {
+    "id": "c-ybs",
+    "name": "Your Box Solution",
+    "brand": "Your Box Solution",
+    "role": "Print / Box Supplier",
+    "email": "",
+    "notes": "Handles folding cartons and labels. Daily Rou boxes + labels all completed 5/11/2026. 19pt matte soft-touch boxes, BOPP gloss labels."
+  }
+]

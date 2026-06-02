@@ -1,0 +1,46 @@
+[
+  {
+    "id": "web-tcf-home",
+    "name": "TCF Homepage",
+    "status": "In Progress",
+    "designer": "Katherine",
+    "developer": "TBD",
+    "approvalStatus": "Pending",
+    "launchDate": "2026-07-01",
+    "notes": "Claude Files in progress. Shopify theme customization.",
+    "createdAt": "2026-03-15T09:00:00.000Z"
+  },
+  {
+    "id": "web-tcf-products",
+    "name": "TCF Product Pages",
+    "status": "Not Started",
+    "designer": "Katherine",
+    "developer": "TBD",
+    "approvalStatus": "Pending",
+    "launchDate": "2026-07-15",
+    "notes": "Waiting on final product photography. Launch with cleanser + toner as first SKUs.",
+    "createdAt": "2026-03-15T09:00:00.000Z"
+  },
+  {
+    "id": "web-nevoo",
+    "name": "NeVoo Brand Website",
+    "status": "In Progress",
+    "designer": "Katherine",
+    "developer": "TBD",
+    "approvalStatus": "Pending",
+    "launchDate": "2026-08-01",
+    "notes": "Waiting on final photography and product copy from Molly Smith.",
+    "createdAt": "2026-04-01T09:00:00.000Z"
+  },
+  {
+    "id": "web-tcf-about",
+    "name": "TCF About / Services Page",
+    "status": "Not Started",
+    "designer": "Katherine",
+    "developer": "TBD",
+    "approvalStatus": "Pending",
+    "launchDate": "2026-07-15",
+    "notes": "Manufacturing capabilities, private label, custom formulation services.",
+    "createdAt": "2026-05-01T09:00:00.000Z"
+  }
+]

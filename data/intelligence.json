@@ -1,0 +1,106 @@
+[
+  {
+    "id": "i-chunbai",
+    "category": "Supplier",
+    "title": "Chunbai — Primary Packaging Supplier (Doria Wang)",
+    "body": "Primary bottle and closure supplier across all active client projects: NeVoo, Daily Rou, Nitt Beauty, Salt Spa Yoga, Devoted Man. Handles LDPE Boston Rounds, Black Glass, Glass Square, Airless Containers. Contact: Doria Wang. Provides dielines (LR, SL, RT series). All current projects shipping from Chunbai.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-ybs",
+    "category": "Supplier",
+    "title": "Your Box Solution — Labels + Folding Cartons",
+    "body": "Handles BOPP Gloss labels and 19pt Matte Soft-Touch folding cartons. All 4 Daily Rou completed SKUs used Your Box Solution — order received 5/11/2026. Nitt Beauty boxes also planned here. Fast turnaround once artwork approved.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-nevoo",
+    "category": "Client",
+    "title": "NeVoo — Client Profile (Molly Smith)",
+    "body": "Scalp health brand. 3 SKUs of Reset: Micro-Exfoliant Scalp Scrub complete (8oz Retail, 32oz Back Bar, 2oz Travel). UPCs assigned and print jobs in progress. Next phase: Shampoo + Conditioner (3 SKUs each) — currently Decision Pending/Sourcing on both formula and packaging. Bottle supplier: Chunbai, print: silkscreen matte soft-touch + gold hot stamp.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-devman",
+    "category": "Client",
+    "title": "Devoted Man — Client Profile (Josh Smith)",
+    "body": "Men's grooming brand. Currently developing a Beard Scrub (FML-51-ly957 In Progress). Bottle sourcing from Chunbai. Early stage — no artwork or packaging decisions yet.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-dailyrou",
+    "category": "Client",
+    "title": "Daily Rou — Client Profile (Meredith Baurband)",
+    "body": "Clean skincare line. 4 SKUs fully complete + packaging received (Essential C Serum, Hydrating Cream Cleanser, Gentle Cleansing Oil, Brightening Cleansing Gel). All black glass, BOPP gloss labels + matte soft-touch boxes from Your Box Solution (completed 5/11/2026, 250 units each). Still in progress: SPF-50 Mineral Sunscreen (airless, sourcing) and 1 unspecified product (black glass 120ml pump).",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-nitt",
+    "category": "Client",
+    "title": "Nitt Beauty — Client Profile (Gamze Gurlevik)",
+    "body": "4-SKU line all in progress: HA Serum, Cream Cleanser, Face Cream, Gel Cleanser. All using FML-21-Hy743 formula variants. Glass square 30ml bottles, cap 24-410, silkscreen print — all from Chunbai. Samples received on 3 of 4 SKUs. Boxes from Your Box Solution (19pt matte soft-touch). Key actives: Copper Tripeptide-1, Sodium Hyaluronate, Beta-Glucan.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-salt",
+    "category": "Client",
+    "title": "Salt Spa Yoga — Client Profile (Andrew Moss)",
+    "body": "Spa/wellness brand. 6 SKUs: 5 Sugar Scrub variants (FML-51-ly950/952/953/954/955) + 1 Massage Oil (FML-51-ly951). All formulas assigned, bottle and packaging sourcing not yet started. Chunbai listed as supplier placeholder.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-dieline-ref",
+    "category": "Reference",
+    "title": "Dieline Reference Numbers — Active Projects",
+    "body": "Daily Rou: Essential C = LR0335SC (bottle) + SL2694 (box). Cream/Gel Cleanser = LR0355SC (bottle) + RT3799 (box). Oil Cleanser = LR0277RC (bottle) + LB3538 (box). NeVoo Scrub 8oz = LR-series (Chunbai). All dielines filed with Chunbai/Doria Wang.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-formula-ref",
+    "category": "Reference",
+    "title": "Active Formula SKU Index",
+    "body": "FML-51-ly945: Daily Rou (TBD product, 120ml). FML-51-ly946: Daily Rou Essential C + SPF-50. FML-51-ly947: Daily Rou Cream Cleanser. FML-51-ly948: Daily Rou Oil Cleanser. FML-51-ly949: Daily Rou Gel Cleanser. FML-51-ly950–955: Salt Spa Yoga (6 SKUs). FML-51-ly957: Devoted Man Beard Scrub. FML-21-Hy743: Nitt Beauty (4 SKUs).",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-closure-ref",
+    "category": "Reference",
+    "title": "Closure Spec Reference — Active Projects",
+    "body": "NeVoo Scalp Scrub 8oz + 2oz: Applicator Nozzle + screw cap, 24-410, inner pressure seal. Daily Rou serums: Glass dropper. Daily Rou cleansers: Glass dropper. Nitt Beauty x4: Cap 24-410. Daily Rou SPF: Airless pump. Daily Rou 120ml: Pump 24-410. All sourced through Chunbai.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-upc-ref",
+    "category": "Reference",
+    "title": "UPC Registry — Assigned Barcodes",
+    "body": "NeVoo Reset Scalp Scrub 8oz Retail: 860014943805. NeVoo Reset Scalp Scrub 32oz Back Bar: 860014943829. NeVoo Reset Scalp Scrub 2oz Travel: 860014943812. All others pending UPC assignment.",
+    "source": "Client Status Tracker",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-market-scalp",
+    "category": "Market",
+    "title": "Scalp Health Category — Strong Growth Signal",
+    "body": "NeVoo's scalp scrub positions well in a high-growth segment. Scalp care grew 35% YoY in prestige per NPD 2025. Actives like Biotinoyl Tripeptide, Copper Peptide, and Caffeine are search-trending as consumers treat scalp like skin. Back bar + travel SKUs indicate salon/spa distribution strategy.",
+    "source": "Market observation + NeVoo brief",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "i-regulatory-inci",
+    "category": "Regulatory",
+    "title": "INCI Approval Checklist — Client Products",
+    "body": "All completed Daily Rou formulas have full INCI confirmed. NeVoo Scalp Scrub INCI confirmed. Nitt Beauty + Devoted Man + Salt Spa Yoga formulas still in progress — INCI compliance review needed before label artwork approval. Ensure all INCIs reviewed against EU/FDA requirements before label file sent to print.",
+    "source": "Client Status Tracker + TCF SOP",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  }
+]

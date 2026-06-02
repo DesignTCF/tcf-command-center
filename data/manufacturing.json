@@ -1,0 +1,62 @@
+[
+  {
+    "id": "m1",
+    "name": "Gentle Milky Cleanser — Run 1",
+    "formula": "TCF-003 Gentle Milky Cleanser",
+    "batchSize": "500 units (200ml)",
+    "stage": "Filling",
+    "runDate": "2026-06-03",
+    "notes": "Formula compounded. Filling scheduled June 3-4. Labels printed.",
+    "createdAt": "2026-05-15T09:00:00.000Z"
+  },
+  {
+    "id": "m2",
+    "name": "AHA Toner — Run 1",
+    "formula": "TCF-005 Resurfacing AHA Toner",
+    "batchSize": "750 units (100ml)",
+    "stage": "QC Review",
+    "runDate": "2026-05-28",
+    "notes": "Batch compounded May 28. QC testing in progress — pH and viscosity check.",
+    "createdAt": "2026-05-10T09:00:00.000Z"
+  },
+  {
+    "id": "m3",
+    "name": "SPF Daily Fluid — Client Run (Coastal Derm)",
+    "formula": "CSD-001 SPF 50 Daily Fluid",
+    "batchSize": "1,000 units (50ml)",
+    "stage": "Scheduled",
+    "runDate": "2026-06-18",
+    "notes": "Packaging arriving June 12. Run scheduled for June 18. PO confirmed.",
+    "createdAt": "2026-05-20T09:00:00.000Z"
+  },
+  {
+    "id": "m4",
+    "name": "Barrier Repair Moisturizer — Pilot",
+    "formula": "TCF-001 Barrier Repair Moisturizer",
+    "batchSize": "100 units (50ml) pilot",
+    "stage": "In Progress",
+    "runDate": "2026-06-01",
+    "notes": "Pilot batch for stability confirmation. Full run post T=3 approval.",
+    "createdAt": "2026-05-25T09:00:00.000Z"
+  },
+  {
+    "id": "m5",
+    "name": "Hydra-Glow Essence — Client Run (Lumière)",
+    "formula": "LMR-001 Hydra-Glow Essence",
+    "batchSize": "800 units (30ml)",
+    "stage": "Scheduled",
+    "runDate": "2026-08-05",
+    "notes": "Awaiting stability T=3 sign-off before scheduling. Packaging ordered.",
+    "createdAt": "2026-05-18T09:00:00.000Z"
+  },
+  {
+    "id": "m6",
+    "name": "Gentle Milky Cleanser — Run 0 (Pilot)",
+    "formula": "TCF-003 Gentle Milky Cleanser",
+    "batchSize": "50 units pilot",
+    "stage": "Complete",
+    "runDate": "2026-04-15",
+    "notes": "Pilot complete. Formula confirmed scalable. QC passed.",
+    "createdAt": "2026-04-01T09:00:00.000Z"
+  }
+]
