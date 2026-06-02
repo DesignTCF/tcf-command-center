@@ -1,26 +1,27 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AppProvider, useApp } from './store/AppContext'
-import Nav from './components/Nav'
+import NavV3 from './components/NavV3'
 import AIChatPanel from './components/AIChatPanel'
 
-const Dashboard   = lazy(() => import('./pages/Dashboard'))
-const Projects    = lazy(() => import('./pages/Projects'))
-const Products    = lazy(() => import('./pages/Products'))
-const Creative    = lazy(() => import('./pages/Creative'))
-const Operations  = lazy(() => import('./pages/Operations'))
-const Files       = lazy(() => import('./pages/Files'))
-const Intelligence = lazy(() => import('./pages/Intelligence'))
-const Import      = lazy(() => import('./pages/Import'))
-const CalendarPage = lazy(() => import('./pages/CalendarPage'))
-const Alibaba     = lazy(() => import('./pages/Alibaba'))
-const Links       = lazy(() => import('./pages/Links'))
-const GitHub      = lazy(() => import('./pages/GitHub'))
+// V3 pages
+const HomeV3    = lazy(() => import('./pages/HomeV3'))
+const BrandsV3  = lazy(() => import('./pages/BrandsV3'))
+const WorkV3    = lazy(() => import('./pages/WorkV3'))
+const ContentV3 = lazy(() => import('./pages/ContentV3'))
+const AskV3     = lazy(() => import('./pages/AskV3'))
+
+// Legacy pages (accessible via /legacy/* if needed)
+const Files         = lazy(() => import('./pages/Files'))
+const Intelligence  = lazy(() => import('./pages/Intelligence'))
+const Links         = lazy(() => import('./pages/Links'))
+const Alibaba       = lazy(() => import('./pages/Alibaba'))
+const CalendarPage  = lazy(() => import('./pages/CalendarPage'))
 
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center h-full text-ink-muted text-sm">
-      Loading…
+    <div className="flex items-center justify-center h-full text-ink-muted text-sm gap-2">
+      <span className="text-teal animate-pulse">↻</span> Loading…
     </div>
   )
 }
@@ -28,28 +29,26 @@ function PageLoader() {
 function AppInner() {
   const { reload } = useApp()
   return (
-    <div className="h-full flex flex-col">
-      <Nav onRefresh={reload} />
-      <main className="flex-1 mt-[50px] overflow-hidden">
+    <div className="h-full flex flex-col bg-bg">
+      <NavV3 onRefresh={reload} />
+      <main className="flex-1 mt-[52px] overflow-hidden">
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route path="/"            element={<Dashboard />} />
-            <Route path="/projects"    element={<Projects />} />
-            <Route path="/products"    element={<Products />} />
-            <Route path="/creative"    element={<Creative />} />
-            <Route path="/operations"  element={<Operations />} />
-            <Route path="/files"       element={<Files />} />
+            {/* V3 main routes */}
+            <Route path="/"         element={<HomeV3 />} />
+            <Route path="/brands"   element={<BrandsV3 />} />
+            <Route path="/work"     element={<WorkV3 />} />
+            <Route path="/content"  element={<ContentV3 />} />
+            <Route path="/ask"      element={<AskV3 />} />
+            {/* Legacy tools still accessible */}
+            <Route path="/files"    element={<Files />} />
             <Route path="/intelligence" element={<Intelligence />} />
-            <Route path="/import"      element={<Import />} />
-            <Route path="/calendar"    element={<CalendarPage />} />
-            <Route path="/alibaba"     element={<Alibaba />} />
-            <Route path="/links"       element={<Links />} />
-            <Route path="/github"      element={<GitHub />} />
+            <Route path="/links"    element={<Links />} />
+            <Route path="/alibaba"  element={<Alibaba />} />
+            <Route path="/calendar" element={<CalendarPage />} />
           </Routes>
         </Suspense>
       </main>
-      {/* Floating AI chat — appears on every page */}
-      <AIChatPanel />
     </div>
   )
 }

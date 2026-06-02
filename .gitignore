@@ -2,6 +2,13 @@
 .env
 *.env.local
 
+# OAuth tokens — contain private access credentials
+data/gmail-tokens.json
+
+# Cached data — regenerated automatically
+data/gcal-cache.json
+data/alibaba-sync.json
+
 # Dependencies
 node_modules/
 server/node_modules/
@@ -9,6 +16,7 @@ client/node_modules/
 
 # Build output
 client-dist/
+client-dist-gh/
 client/.vite/
 dist/
 

@@ -9,7 +9,7 @@ const initial = {
   manufacturing: [], content: [], decisions: [], intelligence: [],
   suppliers: [], purchasing: [], inventory: [], websiteProjects: [],
   contacts: [], calendar: [], importItems: [], alibabaCo: [],
-  gmailThreads: [], driveFiles: [],
+  gmailThreads: [], driveFiles: [], notionContent: [], notionPageTasks: [],
   brandHealth: { streak: 0, lastUpdated: null },
   // Doc import state
   doc: null,         // { title, sections, plainText, lastFetched }
@@ -61,19 +61,20 @@ export function AppProvider({ children }) {
       'products', 'formulas', 'packaging', 'manufacturing', 'content',
       'decisions', 'intelligence', 'contacts', 'brand-health',
       'projects', 'suppliers', 'purchasing', 'inventory', 'website-projects',
-      'calendar', 'import-items', 'alibaba-convos',
+      'calendar', 'import-items', 'alibaba-convos', 'notion-page-tasks',
     ]
     const stateKeys = [
       'products', 'formulas', 'packaging', 'manufacturing', 'content',
       'decisions', 'intelligence', 'contacts', 'brandHealth',
       'projects', 'suppliers', 'purchasing', 'inventory', 'websiteProjects',
-      'calendar', 'importItems', 'alibabaCo',
+      'calendar', 'importItems', 'alibabaCo', 'notionPageTasks',
     ]
 
-    const [localResults, gmailResult, notionResult, driveResult] = await Promise.allSettled([
+    const [localResults, gmailResult, notionTasksResult, notionContentResult, driveResult] = await Promise.allSettled([
       Promise.allSettled(localKeys.map(k => api.get(`/data/${k}`))),
       api.get('/gmail/threads?limit=40'),
       api.get('/notion/tasks'),
+      api.get('/notion/content'),
       api.get('/drive/recent?limit=60'),
     ])
 
@@ -88,8 +89,10 @@ export function AppProvider({ children }) {
 
     if (gmailResult.status === 'fulfilled')
       dispatch({ type: 'SET', key: 'gmailThreads', value: gmailResult.value })
-    if (notionResult.status === 'fulfilled')
-      dispatch({ type: 'SET', key: 'tasks', value: notionResult.value })
+    if (notionTasksResult.status === 'fulfilled')
+      dispatch({ type: 'SET', key: 'tasks', value: notionTasksResult.value })
+    if (notionContentResult.status === 'fulfilled')
+      dispatch({ type: 'SET', key: 'notionContent', value: notionContentResult.value })
     if (driveResult.status === 'fulfilled')
       dispatch({ type: 'SET', key: 'driveFiles', value: driveResult.value })
 

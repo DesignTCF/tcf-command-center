@@ -1,0 +1,292 @@
+[
+  {
+    "id": "t-tcf-1",
+    "title": "Map which formulas go into which bottles",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Manufacturing",
+    "dueDate": "",
+    "notes": "TCF House Brand project",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-2",
+    "title": "Artwork for labels and boxes \u2014 determine layout (use Claude)",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Layout must be determined first",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-3",
+    "title": "Product images for TCF website",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Creative",
+    "dueDate": "",
+    "notes": "Needed for website launch",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-4",
+    "title": "Write SOPs for manufacturing",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-5",
+    "title": "Research Avery label integration for website self-ordering",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "Goal: customers order labels without contacting TCF, like Avery's system",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-6",
+    "title": "Isopropyl bottle: pull Pauly Inc. mockup and adapt to TCF branding",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Keep flexed bicep graphic, circular logo styling, clinical energy. Adapt Pauly Inc. \u2192 TCF identity",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-7",
+    "title": "Build production-ready TCF isopropyl bottle render",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Review label sizing, bottle proportions, print/layout feasibility",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-tcf-8",
+    "title": "Prepare bottle direction presentation",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-1",
+    "title": "Define TCF website overall visual direction",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "Must align with packaging direction",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-2",
+    "title": "Define TCF homepage structure",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "Isopropyl product as entry point into catalog",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-3",
+    "title": "Define catalog/store architecture for TCF site",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-4",
+    "title": "Define product card and collection page direction",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-5",
+    "title": "Define typography and brand tone for TCF website",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-6",
+    "title": "Pull website references and create initial mockup concept",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-web-7",
+    "title": "Review TCF website direction end of week",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-audit-1",
+    "title": "Get Rashell's audit \u2014 compare with Katherine's",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "Katherine's audit complete and shared with Rashell",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-audit-2",
+    "title": "Build true issues sheet from both audits",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "Pull real issues and missing parts into one master sheet",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-audit-3",
+    "title": "Implement missing parts from audit",
+    "status": "Not started",
+    "priority": "High",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "Work through the issues sheet systematically",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-skin-1",
+    "title": "Build Skin Axis inspiration/reference folder",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Clinical skincare + creator-friendly references",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-skin-2",
+    "title": "Define Skin Axis packaging direction",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Nicole wants glass. Define color, typography, materials, finishes, logo placement",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-skin-3",
+    "title": "Start Skin Axis packaging mockups",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Ensure products look strong on camera for content",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-salt-1",
+    "title": "Do full report and audit of Salt Spa & Yoga company",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-salt-2",
+    "title": "Audit Salt Spa & Yoga website",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-salt-3",
+    "title": "Inventory of assets \u2014 visit spa",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-salt-4",
+    "title": "Define Salt Spa treatments, retail products, and how they correlate",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Operations",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-sip-1",
+    "title": "Pull references for Sip & Formulate digital direction",
+    "status": "Not started",
+    "priority": "Low",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "Boutique wellness/spa, luxury skincare, experiential retail",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-sip-2",
+    "title": "Define Sip & Formulate homepage experience and user flow",
+    "status": "Not started",
+    "priority": "Low",
+    "category": "Website",
+    "dueDate": "",
+    "notes": "Booking flow, retail/product integration, wellness club positioning",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-sip-3",
+    "title": "Create tube labels for Sip & Formulate classes (edit with Nicole)",
+    "status": "Not started",
+    "priority": "Medium",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "2 designs per bottle, black & white version. Talking to Sandy (Ada)",
+    "source": "notion-content"
+  },
+  {
+    "id": "t-sip-4",
+    "title": "Start initial Sip & Formulate mockups and wireframes",
+    "status": "Not started",
+    "priority": "Low",
+    "category": "Design",
+    "dueDate": "",
+    "notes": "",
+    "source": "notion-content"
+  }
+]

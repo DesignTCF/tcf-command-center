@@ -91,11 +91,23 @@ ${context.projects?.length ? `\nProjects: ${context.projects.map(p => `${p.name}
 ${context.decisions?.filter(d => !d.resolved).length ? `\nOpen decisions: ${context.decisions.filter(d => !d.resolved).map(d => d.title).join(', ')}` : ''}
 ` : ''
 
-    const docContent = context?.docText ? `\nGOOGLE DOCUMENT CONTENTS (summary):\n${context.docText.slice(0, 6000)}` : ''
+    const docContent = context?.docText ? `\nGOOGLE DOCUMENT CONTENTS:\n${context.docText.slice(0, 6000)}` : ''
+
+    // Load connected Drive sources
+    let sourcesContext = ''
+    try {
+      const fs = require('fs'), path = require('path')
+      const sourcesFile = path.join(__dirname, '../../data/sources.json')
+      const sources = JSON.parse(fs.readFileSync(sourcesFile, 'utf8') || '[]')
+      if (sources.length > 0) {
+        sourcesContext = '\n\nCONNECTED GOOGLE DRIVE SOURCES:\n' + sources.map(s => s.summary || '').filter(Boolean).join('\n\n---\n\n')
+      }
+    } catch {}
 
     const systemPrompt = `${TCF_CONTEXT}
 ${dashboardSummary}
 ${docContent}
+${sourcesContext}
 
 Answer questions concisely and directly. Make recommendations when asked. Never claim to have made changes to the dashboard — you can only suggest. Format responses with line breaks for readability. Use bullet points when listing items.`
 

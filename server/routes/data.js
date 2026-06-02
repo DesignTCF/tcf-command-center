@@ -78,6 +78,7 @@ makeCRUD('calendar.json')
 makeCRUD('import-items.json')
 makeCRUD('alibaba-convos.json')
 makeCRUD('links.json')
+makeCRUD('notion-page-tasks.json')
 
 // Brand health (singleton object)
 router.get('/brand-health', (req, res) => {

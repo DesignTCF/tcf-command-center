@@ -15,7 +15,7 @@ const app = express()
 const PORT = process.env.PORT || 3001
 const CLIENT_DIST = path.join(__dirname, '../client-dist')
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3001', 'http://localhost:4173'] }))
+app.use(cors({ origin: '*' })) // Allow bookmarklet from any domain (alibaba.com, etc.)
 app.use(express.json({ limit: '50mb' }))
 
 app.use('/api/notion', notionRoutes)
@@ -25,6 +25,11 @@ app.use('/api/data', dataRoutes)
 app.use('/api/docs', docsRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/github', githubRoutes)
+app.use('/api/sources', require('./routes/sources'))
+app.use('/auth/gmail', require('./routes/gmail-auth'))
+app.use('/api/alibaba-sync', require('./routes/alibaba-sync'))
+app.use('/api/gcal', require('./routes/gcal'))
+app.use('/alibaba-sync-setup', require('./routes/alibaba-bookmarklet'))
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }))
 
