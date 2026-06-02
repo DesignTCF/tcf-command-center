@@ -287,109 +287,153 @@ function BrandSection({ brandName, products, showBrandHeader, expandedProduct, s
   )
 }
 
-// ── Product Card ──────────────────────────────────────────────────────────────
+// ── Product Card — fully inline editable ─────────────────────────────────────
 function ProductCard({ product: p, expanded, onExpand, onEdit, onDelete }) {
+  const { dispatch } = useApp()
+  const [saving, setSaving] = useState(false)
   const borderColor = STATUS_COLORS[p.status] || 'border-l-border2'
+
+  // Save a single field change immediately
+  async function saveField(field, value) {
+    const changes = { [field]: value }
+    setSaving(true)
+    try {
+      const updated = await api.patch(`/data/products/${p.id}`, changes)
+      dispatch({ type: 'UPDATE', key: 'products', id: p.id, value: updated })
+    } catch {
+      dispatch({ type: 'UPDATE', key: 'products', id: p.id, value: changes })
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className={`bg-white border border-border rounded-lg border-l-4 ${borderColor} transition-shadow hover:shadow-sm`}>
-      {/* Card header */}
-      <div className="px-4 pt-3.5 pb-3 cursor-pointer" onClick={onExpand}>
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-ink leading-snug">{p.name}</h3>
-          <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button className="btn-icon text-xs" onClick={e => { e.stopPropagation(); onEdit() }}>✎</button>
-            <button className="btn-icon text-xs text-ink-muted hover:text-red" onClick={e => { e.stopPropagation(); onDelete() }}>✕</button>
-          </div>
+      {/* Card header — always visible */}
+      <div className="px-4 pt-3.5 pb-2">
+        <div className="flex items-start gap-2">
+          {/* Product name — inline editable */}
+          <input
+            className="flex-1 text-sm font-semibold text-ink bg-transparent border-none outline-none focus:bg-surface focus:px-1.5 focus:rounded transition-all min-w-0 -ml-0.5"
+            defaultValue={p.name}
+            onBlur={e => e.target.value !== p.name && saveField('name', e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && e.target.blur()}
+            placeholder="Product name"
+          />
+          {saving && <span className="text-[9px] text-teal shrink-0 mt-1">Saving…</span>}
+          <button className="btn-icon text-xs text-ink-muted hover:text-red shrink-0 mt-0.5" onClick={e => { e.stopPropagation(); onDelete() }} title="Delete">✕</button>
         </div>
+
+        {/* Status + Category row — both editable dropdowns */}
         <div className="flex items-center gap-2 mt-2 flex-wrap">
-          <StatusBadge status={p.status} />
-          {p.category && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface2 text-ink-muted border border-border font-medium">
-              {p.category}
-            </span>
-          )}
+          <select
+            value={p.status || ''}
+            onChange={e => saveField('status', e.target.value)}
+            className="text-[10px] font-bold px-1.5 py-0.5 rounded border cursor-pointer bg-transparent focus:outline-none"
+            style={{ borderColor: 'currentColor' }}
+          >
+            {STATUSES.map(s => <option key={s}>{s}</option>)}
+          </select>
+          <select
+            value={p.category || ''}
+            onChange={e => saveField('category', e.target.value)}
+            className="text-[10px] px-1.5 py-0.5 rounded border border-border bg-surface2 text-ink-muted cursor-pointer focus:outline-none"
+          >
+            <option value="">Category</option>
+            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          </select>
         </div>
-        {p.notes && (
-          <p className="text-[11.5px] text-ink-muted mt-2 leading-snug line-clamp-2">{p.notes}</p>
-        )}
       </div>
 
-      {/* Expand button */}
-      <div className="px-4 pb-3 flex items-center justify-between">
-        <button
-          onClick={onExpand}
-          className="text-[10.5px] text-teal hover:text-teal-dim font-medium transition-colors"
-        >
-          {expanded ? '▲ Less' : '▼ Details'}
+      {/* Expand toggle */}
+      <div className="px-4 pb-2.5">
+        <button onClick={onExpand} className="text-[10.5px] text-teal hover:text-teal-dim font-medium transition-colors">
+          {expanded ? '▲ Collapse' : '▼ Edit All Fields'}
         </button>
-        <div className="flex gap-1">
-          <button className="btn-icon text-xs opacity-50 hover:opacity-100" onClick={e => { e.stopPropagation(); onEdit() }} title="Edit">✎</button>
-          <button className="btn-icon text-xs text-ink-muted hover:text-red opacity-50 hover:opacity-100" onClick={e => { e.stopPropagation(); onDelete() }} title="Delete">✕</button>
-        </div>
       </div>
 
-      {/* Expanded details */}
+      {/* ── Expanded inline edit form ── */}
       {expanded && (
-        <div className="border-t border-border px-4 py-3 bg-surface rounded-b-lg">
-          <ExpandedDetails product={p} />
+        <div className="border-t border-border bg-surface rounded-b-lg px-4 py-4 flex flex-col gap-4">
+
+          {/* Row 1: Product info */}
+          <div className="grid grid-cols-2 gap-3">
+            <EditField label="Product / Label Name" value={p.marketingName} placeholder="Name on the label" onSave={v => saveField('marketingName', v)} />
+            <EditField label="Internal / Project Name" value={p.name} placeholder="Internal name" onSave={v => saveField('name', v)} />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-border pt-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-teal mb-3">Formula</div>
+            <div className="grid grid-cols-2 gap-3">
+              <EditField label="Formula Number" value={p.formulaNumber} placeholder="e.g. FML-51-ly947" onSave={v => saveField('formulaNumber', v)} mono />
+              <SelectField label="Formula Status" value={p.formulaStatus} options={STATUSES} onSave={v => saveField('formulaStatus', v)} />
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-border pt-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-teal mb-3">Packaging</div>
+            <div className="grid grid-cols-2 gap-3">
+              <EditField label="Bottle / Container" value={p.bottleName} placeholder="e.g. 30ml Frosted Glass Dropper" onSave={v => saveField('bottleName', v)} />
+              <EditField label="Sourced From" value={p.bottleSupplier} placeholder="Supplier name" onSave={v => saveField('bottleSupplier', v)} />
+              <SelectField label="Packaging Status" value={p.bottleStatus} options={['Sourcing', 'Sampling', 'Pending Approval', 'Approved', 'In Production', 'Received', 'Delivered']} onSave={v => saveField('bottleStatus', v)} />
+              <EditField label="MOQ / Lead Time" value={p.packagingNotes} placeholder="e.g. 1,000 units · 8 weeks" onSave={v => saveField('packagingNotes', v)} />
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="border-t border-border pt-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-ink-muted mb-2">Notes</div>
+            <textarea
+              className="input-field text-xs resize-none leading-relaxed"
+              rows={3}
+              defaultValue={p.notes || ''}
+              placeholder="Add notes…"
+              onBlur={e => e.target.value !== (p.notes || '') && saveField('notes', e.target.value)}
+            />
+          </div>
+
+          {/* Delete */}
+          <div className="flex justify-end pt-1 border-t border-border">
+            <button className="text-[10.5px] text-ink-muted hover:text-red transition-colors" onClick={onDelete}>
+              Delete product
+            </button>
+          </div>
         </div>
       )}
     </div>
   )
 }
 
-// ── Expanded Details ──────────────────────────────────────────────────────────
-function ExpandedDetails({ product: p }) {
-  const { state } = useApp()
-
-  const relatedFormulas = (state.formulas || []).filter(f =>
-    f.brand?.toLowerCase().includes('client') ||
-    f.name?.toLowerCase().includes(p.name?.split('—')[0]?.toLowerCase().trim().slice(0, 10))
-  ).slice(0, 2)
-
-  const relatedPackaging = (state.packaging || []).filter(pkg =>
-    pkg.brand && p.name && (
-      pkg.brand.toLowerCase().includes(p.clientBrand?.toLowerCase() || '') ||
-      p.name.toLowerCase().includes(pkg.brand.toLowerCase().split(' ')[0])
-    )
-  ).slice(0, 3)
-
+// ── Inline field components ───────────────────────────────────────────────────
+function EditField({ label, value, placeholder, onSave, mono }) {
   return (
-    <div className="grid grid-cols-2 gap-3 text-xs">
-      {/* Formula info */}
-      <div>
-        <div className="text-[10px] font-bold uppercase tracking-wider text-ink-muted mb-1.5">Formula</div>
-        {relatedFormulas.length > 0 ? relatedFormulas.map(f => (
-          <div key={f.id} className="mb-1.5">
-            <div className="font-medium text-ink text-[11px]">{f.name}</div>
-            <div className="text-ink-muted text-[10.5px]">{f.batch || '—'} · <StatusBadge status={f.status} /></div>
-          </div>
-        )) : (
-          <div className="text-ink-muted text-[11px]">No formula linked</div>
-        )}
-      </div>
+    <div>
+      <div className="text-[9.5px] font-bold uppercase tracking-wider text-ink-muted mb-1">{label}</div>
+      <input
+        className={`input-field text-xs py-1.5 ${mono ? 'font-mono' : ''}`}
+        defaultValue={value || ''}
+        placeholder={placeholder}
+        onBlur={e => onSave(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && e.target.blur()}
+      />
+    </div>
+  )
+}
 
-      {/* Packaging info */}
-      <div>
-        <div className="text-[10px] font-bold uppercase tracking-wider text-ink-muted mb-1.5">Packaging</div>
-        {relatedPackaging.length > 0 ? relatedPackaging.map(pkg => (
-          <div key={pkg.id} className="mb-1.5">
-            <div className="font-medium text-ink text-[11px]">{pkg.item}</div>
-            <div className="text-ink-muted text-[10.5px]">{pkg.supplier || '—'} · <StatusBadge status={pkg.status} /></div>
-          </div>
-        )) : (
-          <div className="text-ink-muted text-[11px]">No packaging linked</div>
-        )}
-      </div>
-
-      {/* Full notes */}
-      {p.notes && (
-        <div className="col-span-2 pt-2 border-t border-border">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-ink-muted mb-1">Notes</div>
-          <p className="text-ink-muted text-[11.5px] leading-relaxed">{p.notes}</p>
-        </div>
-      )}
+function SelectField({ label, value, options, onSave }) {
+  return (
+    <div>
+      <div className="text-[9.5px] font-bold uppercase tracking-wider text-ink-muted mb-1">{label}</div>
+      <select
+        className="input-field text-xs py-1.5 cursor-pointer"
+        value={value || ''}
+        onChange={e => onSave(e.target.value)}
+      >
+        <option value="">— Select —</option>
+        {options.map(o => <option key={o}>{o}</option>)}
+      </select>
     </div>
   )
 }
