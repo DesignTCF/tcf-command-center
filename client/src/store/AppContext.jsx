@@ -4,9 +4,6 @@ import staticData from '../data/staticData'
 
 const AppContext = createContext(null)
 
-// Detect if we're on GitHub Pages (no backend available)
-const IS_STATIC = import.meta.env.BASE_URL === '/tcf-command-center/'
-
 const initial = {
   tasks: [], projects: [], products: [], formulas: [], packaging: [],
   manufacturing: [], content: [], decisions: [], intelligence: [],
@@ -45,9 +42,17 @@ export function AppProvider({ children }) {
   async function loadAll() {
     dispatch({ type: 'LOADING', value: true })
 
-    // On GitHub Pages (no backend): load static baked-in data immediately
-    if (IS_STATIC) {
-      dispatch({ type: 'SET_MANY', payload: staticData })
+    // Always load static baked-in data first — instant, works everywhere
+    dispatch({ type: 'SET_MANY', payload: staticData })
+
+    // Then try live API — if server is running, it overwrites with fresh data
+    let serverUp = false
+    try {
+      await fetch('/api/health', { signal: AbortSignal.timeout(1500) })
+      serverUp = true
+    } catch { /* no server — static data is good */ }
+
+    if (!serverUp) {
       dispatch({ type: 'SYNCED' })
       return
     }
