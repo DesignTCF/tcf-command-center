@@ -1,4 +1,3 @@
-// Auto-generated static data
 const staticData = {
   "products": [
     {
