@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import api from '../lib/api'
+import staticData from '../data/staticData'
 
 const AppContext = createContext(null)
+
+// Detect if we're on GitHub Pages (no backend available)
+const IS_STATIC = import.meta.env.BASE_URL === '/tcf-command-center/'
 
 const initial = {
   tasks: [], projects: [], products: [], formulas: [], packaging: [],
@@ -41,6 +45,13 @@ export function AppProvider({ children }) {
   async function loadAll() {
     dispatch({ type: 'LOADING', value: true })
 
+    // On GitHub Pages (no backend): load static baked-in data immediately
+    if (IS_STATIC) {
+      dispatch({ type: 'SET_MANY', payload: staticData })
+      dispatch({ type: 'SYNCED' })
+      return
+    }
+
     const localKeys = [
       'products', 'formulas', 'packaging', 'manufacturing', 'content',
       'decisions', 'intelligence', 'contacts', 'brand-health',
@@ -65,6 +76,7 @@ export function AppProvider({ children }) {
       const payload = {}
       localResults.value.forEach((r, i) => {
         if (r.status === 'fulfilled') payload[stateKeys[i]] = r.value
+        else if (staticData[stateKeys[i]]) payload[stateKeys[i]] = staticData[stateKeys[i]]
       })
       dispatch({ type: 'SET_MANY', payload })
     }
