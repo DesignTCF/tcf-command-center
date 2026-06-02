@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: tcf-command-center
+    runtime: node
+    rootDir: server
+    buildCommand: cd .. && cd client && npm install && npm run build && cd ../server && npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: NOTION_TOKEN
+        sync: false
+      - key: NOTION_TODO_DB_ID
+        value: 337162124ddd80508602d598cd2896da
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_REFRESH_TOKEN
+        sync: false
+      - key: GDRIVE_CLIENT_ID
+        sync: false
+      - key: GDRIVE_CLIENT_SECRET
+        sync: false
+      - key: GDRIVE_REFRESH_TOKEN
+        sync: false
+      - key: GDOC_ID
+        value: 1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_USER
+        value: DesignTCF
+      - key: GITHUB_TOKEN
+        sync: false
