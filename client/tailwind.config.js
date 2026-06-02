@@ -5,23 +5,23 @@ export default {
     extend: {
       colors: {
         bg:       '#FFFFFF',
-        surface:  '#F7F7F7',
-        surface2: '#EFEFEF',
+        surface:  '#F5F5F5',
+        surface2: '#EEEEEE',
         surface3: '#E5E5E5',
-        border:   '#E0E0E0',
-        border2:  '#CCCCCC',
-        ink:      '#111111',
-        'ink-dim':   '#555555',
-        'ink-muted': '#AAAAAA',
-        teal:     '#1AADAD',
-        'teal-dim':  '#128888',
-        gold:     '#B8921E',
-        'gold-dim':  '#8F6E10',
-        green:    '#1A9E6A',
-        amber:    '#C47A0A',
-        red:      '#CC3333',
-        blue:     '#3366CC',
-        purple:   '#6644BB',
+        border:   '#D8D8D8',
+        border2:  '#BBBBBB',
+        ink:      '#1A1A1A',       // primary text — near black
+        'ink-dim':   '#444444',    // secondary text — dark gray
+        'ink-muted': '#777777',    // tertiary text — medium gray (was #AAAAAA — too light)
+        teal:     '#0D9E9E',       // slightly darker for better contrast on white
+        'teal-dim':  '#0A7A7A',
+        gold:     '#A07A10',       // darker gold for readability
+        'gold-dim':  '#7A5C08',
+        green:    '#157A50',       // darker green
+        amber:    '#A86200',       // darker amber
+        red:      '#B52B2B',       // darker red
+        blue:     '#2255AA',       // darker blue
+        purple:   '#5533AA',       // darker purple
       },
       fontFamily: {
         sans: ['"Inter"', '"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"Helvetica Neue"', 'sans-serif'],

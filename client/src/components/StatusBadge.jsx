@@ -1,63 +1,61 @@
 import React from 'react'
 
+// All colors tuned for white backgrounds — sufficient contrast
 const STATUS_COLORS = {
-  // Task / Project statuses
-  'Not Started': 'text-ink-muted bg-surface2 border-border2',
-  'In Progress': 'text-teal bg-teal/10 border-teal/30',
-  'Complete': 'text-green bg-green/10 border-green/30',
-  'Completed': 'text-green bg-green/10 border-green/30',
-  'Done': 'text-green bg-green/10 border-green/30',
-  'Blocked': 'text-red bg-red/10 border-red/30',
-  'On Hold': 'text-amber bg-amber/10 border-amber/30',
-  'Waiting': 'text-amber bg-amber/10 border-amber/30',
-  'Pending': 'text-amber bg-amber/10 border-amber/30',
-
-  // Product statuses
-  'Concept': 'text-ink-muted bg-surface2 border-border2',
-  'Formulating': 'text-blue bg-blue/10 border-blue/30',
-  'Stability Testing': 'text-amber bg-amber/10 border-amber/30',
-  'Packaging Development': 'text-gold bg-gold/10 border-gold/30',
-  'Artwork Development': 'text-purple bg-purple/10 border-purple/30',
-  'Approved': 'text-teal bg-teal/10 border-teal/30',
-  'Production': 'text-green bg-green/10 border-green/30',
-  'Ready To Launch': 'text-gold bg-gold/10 border-gold/30',
-  'Live': 'text-green bg-green/10 border-green/30',
-  'Ready': 'text-teal bg-teal/10 border-teal/30',
-  'In Development': 'text-blue bg-blue/10 border-blue/30',
-
-  // Packaging statuses
-  'Sourcing': 'text-ink-muted bg-surface2 border-border2',
-  'Sampling': 'text-amber bg-amber/10 border-amber/30',
-  'Pending Approval': 'text-gold bg-gold/10 border-gold/30',
-  'In Production': 'text-blue bg-blue/10 border-blue/30',
-  'Received': 'text-green bg-green/10 border-green/30',
-  'Delivered': 'text-green bg-green/10 border-green/30',
-
-  // Purchasing
-  'RFQ': 'text-ink-muted bg-surface2 border-border2',
-  'Quote': 'text-amber bg-amber/10 border-amber/30',
-  'PO': 'text-blue bg-blue/10 border-blue/30',
-  'Production Order': 'text-teal bg-teal/10 border-teal/30',
-  'Confirmed': 'text-teal bg-teal/10 border-teal/30',
-
-  // Priority
-  'High': 'text-red bg-red/10 border-red/30',
-  'Medium': 'text-amber bg-amber/10 border-amber/30',
-  'Low': 'text-ink-muted bg-surface2 border-border2',
-
-  // Print statuses
-  'Decision Pending/Sourcing': 'text-amber bg-amber/10 border-amber/30',
-  'Print Samples': 'text-blue bg-blue/10 border-blue/30',
-  'Ordered': 'text-teal bg-teal/10 border-teal/30',
-  'Samples Recieved': 'text-teal bg-teal/10 border-teal/30',
-  'Samples Received': 'text-teal bg-teal/10 border-teal/30',
+  'Not Started':           'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'In Progress':           'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Complete':              'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Completed':             'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Done':                  'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Blocked':               'text-[#B52B2B] bg-[#FAE5E5] border-[#CC4444]',
+  'On Hold':               'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Waiting':               'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Pending':               'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Concept':               'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Formulating':           'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'In Development':        'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'Stability Testing':     'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Packaging Development': 'text-[#7A5C08] bg-[#F8EFD0] border-[#A07A10]',
+  'Artwork Development':   'text-[#5533AA] bg-[#EBE5F8] border-[#6644BB]',
+  'Approved':              'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Production':            'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Ready To Launch':       'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Ready':                 'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Live':                  'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Sourcing':              'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Sampling':              'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Pending Approval':      'text-[#7A5C08] bg-[#F8EFD0] border-[#A07A10]',
+  'In Production':         'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'Received':              'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'Delivered':             'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'RFQ':                   'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Quote':                 'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'PO':                    'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'Production Order':      'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Confirmed':             'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Cancelled':             'text-[#B52B2B] bg-[#FAE5E5] border-[#CC4444]',
+  'Critical':              'text-[#B52B2B] bg-[#FAE5E5] border-[#CC4444]',
+  'High':                  'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Medium':                'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Low':                   'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Decision Pending/Sourcing': 'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'Print Samples':         'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'Ordered':               'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Samples Received':      'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'Samples Recieved':      'text-[#0A7A7A] bg-[#DCF2F2] border-[#0D9E9E]',
+  'WAITING':               'text-[#A86200] bg-[#FDEFD5] border-[#CC8800]',
+  'COMPLETE':              'text-[#157A50] bg-[#DCF0E8] border-[#1AA36A]',
+  'IN PROGRESS':           'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
+  'NOT STARTED':           'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Planning':              'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]',
+  'Active':                'text-[#2255AA] bg-[#E2EAF8] border-[#3366CC]',
 }
 
 export default function StatusBadge({ status, className = '' }) {
   if (!status) return null
-  const colors = STATUS_COLORS[status] || 'text-ink-muted bg-surface2 border-border2'
+  const colors = STATUS_COLORS[status] || 'text-[#555555] bg-[#EEEEEE] border-[#CCCCCC]'
   return (
-    <span className={`inline-flex items-center px-[7px] py-[2px] rounded-[3px] border text-[10px] font-semibold tracking-[0.06em] uppercase whitespace-nowrap ${colors} ${className}`}>
+    <span className={`inline-flex items-center px-2 py-[2.5px] rounded border text-[10.5px] font-semibold tracking-[0.03em] uppercase whitespace-nowrap ${colors} ${className}`}>
       {status}
     </span>
   )
