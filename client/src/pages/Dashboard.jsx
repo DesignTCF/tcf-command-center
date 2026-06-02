@@ -11,9 +11,9 @@ import api from '../lib/api';
 const IN_DEV_STATUSES = ['Concept', 'Formulating', 'In Development', 'Stability Testing'];
 const TASK_CATEGORIES = ['Operations', 'Product Development', 'Creative', 'Website', 'Purchasing', 'Inventory', 'Supplier Management', 'Marketing', 'Research'];
 const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
-const PRIORITY_COLORS = { Critical: '#E05252', High: '#F5A623', Medium: '#2ABFBF', Low: '#444' };
-const PRIORITY_TEXT = { Critical: 'text-red-400', High: 'text-amber-400', Medium: 'text-teal-400', Low: 'text-ink-muted' };
-const PRIORITY_BG = { Critical: 'bg-red-500/10 border-red-500/30', High: 'bg-amber-500/10 border-amber-500/30', Medium: 'bg-teal-500/10 border-teal-500/30', Low: 'bg-border/40 border-border2' };
+const PRIORITY_COLORS = { Critical: '#B52B2B', High: '#A86200', Medium: '#0D9E9E', Low: '#58595b' };
+const PRIORITY_TEXT = { Critical: 'text-red', High: 'text-amber', Medium: 'text-teal', Low: 'text-ink-muted' };
+const PRIORITY_BG = { Critical: 'bg-red/10 border-red-500/30', High: 'bg-amber-500/10 border-amber-500/30', Medium: 'bg-teal-500/10 border-teal-500/30', Low: 'bg-border/40 border-border2' };
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function isWithin7Days(dateStr) {
@@ -62,7 +62,7 @@ function DonutChart({ data, size = 120 }) {
 }
 
 // ─── Horizontal Bar Chart ────────────────────────────────────────────────────
-function HBarChart({ data, color = '#2ABFBF', maxBars = 6 }) {
+function HBarChart({ data, color = '#0D9E9E', maxBars = 6 }) {
   // data: [{ label, value }]
   const shown = data.slice(0, maxBars);
   const max = Math.max(...shown.map(d => d.value), 1);
@@ -87,7 +87,7 @@ function HBarChart({ data, color = '#2ABFBF', maxBars = 6 }) {
 
 // ─── Priority Badge ──────────────────────────────────────────────────────────
 function PriBadge({ priority }) {
-  const map = { Critical: 'bg-red-500/20 text-red-400', High: 'bg-amber-500/20 text-amber-400', Medium: 'bg-teal-500/20 text-teal-400', Low: 'bg-surface3 text-ink-muted' };
+  const map = { Critical: 'bg-red/10 text-red', High: 'bg-amber/10 text-amber', Medium: 'bg-teal/10 text-teal', Low: 'bg-surface3 text-ink-muted' };
   return <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${map[priority] || map.Low}`}>{priority || 'Low'}</span>;
 }
 
@@ -109,7 +109,7 @@ function ItemRow({ item }) {
       {item.priority && <PriBadge priority={item.priority} />}
       {item.status && <StatusBadge status={item.status} />}
       {item.dueDate && (
-        <span className={`text-xs shrink-0 ${overdue ? 'text-red-400' : 'text-ink-dim'}`}>
+        <span className={`text-xs shrink-0 ${overdue ? 'text-red' : 'text-ink-dim'}`}>
           {overdue ? '⚠ ' : ''}{fmtDateShort(item.dueDate)}
         </span>
       )}
@@ -304,17 +304,17 @@ export default function Dashboard() {
 
   const productStatusCounts = useMemo(() => {
     const statuses = [...new Set(products.map(p => p.status).filter(Boolean))];
-    const colorMap = { Active: '#3ECF8E', 'In Development': '#2ABFBF', Concept: '#9B7CF5', Formulating: '#5B8CF5', 'Stability Testing': '#F5A623', Discontinued: '#E05252', Ready: '#C9A84C' };
+    const colorMap = { Active: '#157A50', 'In Development': '#0D9E9E', Concept: '#5533AA', Formulating: '#2255AA', 'Stability Testing': '#A86200', Discontinued: '#B52B2B', Ready: '#A07A10' };
     return statuses.map(s => ({ label: s, value: products.filter(p => p.status === s).length, color: colorMap[s] || '#444' }));
   }, [products]);
 
   const projectStatusCounts = useMemo(() => {
     const statusDef = [
       { label: 'Not Started', color: '#444' },
-      { label: 'In Progress', color: '#2ABFBF' },
-      { label: 'Complete', color: '#3ECF8E' },
-      { label: 'Blocked', color: '#E05252' },
-      { label: 'On Hold', color: '#F5A623' },
+      { label: 'In Progress', color: '#0D9E9E' },
+      { label: 'Complete', color: '#157A50' },
+      { label: 'Blocked', color: '#B52B2B' },
+      { label: 'On Hold', color: '#A86200' },
     ];
     return statusDef.map(s => ({ ...s, value: projects.filter(p => p.status === s.label).length })).filter(d => d.value > 0);
   }, [projects]);
@@ -454,13 +454,13 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 {proj.priority && <PriBadge priority={proj.priority} />}
                 {proj.dueDate && (
-                  <span className={`text-xs ${isOverdue(proj.dueDate) ? 'text-red-400' : 'text-ink-muted'}`}>
+                  <span className={`text-xs ${isOverdue(proj.dueDate) ? 'text-red' : 'text-ink-muted'}`}>
                     Due {fmtDateShort(proj.dueDate)}
                   </span>
                 )}
               </div>
               {proj.blockerNote && (
-                <div className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/20">
+                <div className="text-xs text-red bg-red/10 px-2 py-1 rounded border border-red/30">
                   ⚠ {proj.blockerNote}
                 </div>
               )}
@@ -537,7 +537,7 @@ export default function Dashboard() {
         {/* Chart 2 - Tasks by Category */}
         <div className="panel p-4">
           <div className="text-xs text-ink-muted font-medium uppercase tracking-wider mb-3">Tasks by Category</div>
-          <HBarChart data={taskCategoryCounts} color="#2ABFBF" maxBars={6} />
+          <HBarChart data={taskCategoryCounts} color="#0D9E9E" maxBars={6} />
         </div>
 
         {/* Chart 3 - Products by Status */}
@@ -561,7 +561,7 @@ export default function Dashboard() {
           <div className="text-xs text-ink-muted font-medium uppercase tracking-wider mb-3">Projects by Status</div>
           <HBarChart
             data={projectStatusCounts.map(d => ({ label: d.label, value: d.value }))}
-            color="#2ABFBF"
+            color="#0D9E9E"
             maxBars={5}
           />
         </div>

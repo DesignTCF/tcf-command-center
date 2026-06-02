@@ -28,9 +28,9 @@ const modalFields = [
 function ProgressBar({ value }) {
   const pct = Math.min(100, Math.max(0, Number(value) || 0));
   return (
-    <div className="mt-1 w-full rounded-full overflow-hidden" style={{ height: 4, background: 'var(--color-surface2, #1a1a1a)' }}>
+    <div className="mt-1 w-full rounded-full overflow-hidden" style={{ height: 4, background: '#EEEEEE' }}>
       <div
-        style={{ width: `${pct}%`, height: '100%', background: 'var(--color-teal, #2ABFBF)', transition: 'width 0.3s' }}
+        style={{ width: `${pct}%`, height: '100%', background: '#0D9E9E', transition: 'width 0.3s' }}
       />
     </div>
   );
@@ -133,13 +133,13 @@ function SubPanel({ project, state }) {
 
   return (
     <div className="panel mt-0 rounded-t-none border-t-0" style={{ borderTop: 'none' }}>
-      <div className="flex gap-1 border-b" style={{ borderColor: 'var(--color-border, #222)' }}>
+      <div className="flex gap-1 border-b" style={{ borderColor: '#D8D8D8' }}>
         {SUB_TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-xs font-medium transition-colors ${activeTab === tab ? 'text-teal border-b-2 border-teal' : 'text-ink-dim hover:text-ink'}`}
-            style={activeTab === tab ? { borderBottomColor: 'var(--color-teal, #2ABFBF)' } : {}}
+            style={activeTab === tab ? { borderBottomColor: '#0D9E9E' } : {}}
           >
             {tab}
           </button>
@@ -247,7 +247,7 @@ export default function Projects() {
     <div className="page-scroll">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-        <h1 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--color-ink, #F0EDE8)' }}>Projects</h1>
+        <h1 className="text-xl font-semibold tracking-tight" style={{ color: '#1A1A1A' }}>Projects</h1>
         <button className="btn-primary text-sm" onClick={() => setShowModal(true)}>+ Add Project</button>
       </div>
 
@@ -258,7 +258,7 @@ export default function Projects() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors border ${filter === f ? 'border-teal text-teal' : 'border-border text-ink-dim hover:text-ink hover:border-border2'}`}
-            style={filter === f ? { borderColor: 'var(--color-teal, #2ABFBF)', color: 'var(--color-teal, #2ABFBF)' } : {}}
+            style={filter === f ? { borderColor: '#0D9E9E', color: '#0D9E9E' } : {}}
           >
             {f}
           </button>
@@ -297,14 +297,14 @@ export default function Projects() {
                   <tr
                     key={project.id}
                     className="cursor-pointer transition-colors"
-                    style={{ background: isExpanded ? 'var(--color-surface2, #1a1a1a)' : undefined }}
+                    style={{ background: isExpanded ? '#EEEEEE' : undefined }}
                     onClick={() => setExpandedId(isExpanded ? null : project.id)}
                   >
                     {/* Project Name + Progress Bar */}
                     <td onClick={e => e.stopPropagation()}>
                       <div
                         className="font-medium text-sm cursor-pointer"
-                        style={{ color: 'var(--color-ink, #F0EDE8)' }}
+                        style={{ color: '#1A1A1A' }}
                         onClick={() => setExpandedId(isExpanded ? null : project.id)}
                       >
                         {project.name || '—'}
@@ -427,7 +427,7 @@ export default function Projects() {
                         </button>
                         <button
                           className="btn-icon text-xs"
-                          style={{ color: 'var(--color-red, #e05252)' }}
+                          style={{ color: '#B52B2B' }}
                           onClick={() => setDeleteConfirm(project)}
                           title="Delete"
                         >
@@ -482,15 +482,15 @@ export default function Projects() {
             className="panel p-6 max-w-sm w-full"
             onClick={e => e.stopPropagation()}
           >
-            <h2 className="text-base font-semibold mb-2" style={{ color: 'var(--color-ink, #F0EDE8)' }}>Delete Project</h2>
-            <p className="text-sm mb-5" style={{ color: 'var(--color-ink-dim, #888)' }}>
-              Are you sure you want to delete <strong style={{ color: 'var(--color-ink)' }}>{deleteConfirm.name}</strong>? This cannot be undone.
+            <h2 className="text-base font-semibold mb-2" style={{ color: '#1A1A1A' }}>Delete Project</h2>
+            <p className="text-sm mb-5" style={{ color: '#444444' }}>
+              Are you sure you want to delete <strong style={{ color: '#1A1A1A' }}>{deleteConfirm.name}</strong>? This cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button className="btn-ghost text-sm" onClick={() => setDeleteConfirm(null)}>Cancel</button>
               <button
                 className="btn-primary text-sm"
-                style={{ background: 'var(--color-red, #e05252)', borderColor: 'var(--color-red, #e05252)' }}
+                style={{ background: '#B52B2B', borderColor: '#B52B2B' }}
                 onClick={() => handleDelete(deleteConfirm)}
               >
                 Delete

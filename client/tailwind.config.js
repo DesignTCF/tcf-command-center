@@ -12,7 +12,7 @@ export default {
         border2:  '#BBBBBB',
         ink:      '#1A1A1A',       // primary text — near black
         'ink-dim':   '#444444',    // secondary text — dark gray
-        'ink-muted': '#777777',    // tertiary text — medium gray (was #AAAAAA — too light)
+        'ink-muted': '#58595b',    // minimum text color — no lighter than this
         teal:     '#0D9E9E',       // slightly darker for better contrast on white
         'teal-dim':  '#0A7A7A',
         gold:     '#A07A10',       // darker gold for readability
