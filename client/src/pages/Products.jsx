@@ -165,7 +165,7 @@ export default function Products() {
         >
           All <span className="opacity-60">{products.length}</span>
         </button>
-        {STATUSES.filter(s => statusCounts[s] > 0).map(s => (
+        {STATUSES.map(s => (
           <button key={s} onClick={() => setStatusFilter(statusFilter === s ? 'All' : s)}
             className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${statusFilter === s ? 'bg-teal/10 border-teal/40 text-teal' : 'bg-surface border-border text-ink-muted hover:border-teal/40 hover:text-teal'}`}>
             {s} <span className="opacity-60">{statusCounts[s]}</span>
