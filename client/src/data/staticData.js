@@ -1,4 +1,4 @@
-// Auto-generated static data — all local JSON baked in for GitHub Pages
+// Auto-generated static data
 const staticData = {
   "products": [
     {
@@ -7,7 +7,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "UPC: 860014943805. Formula complete. Bottle ordered (LDPE Boston Round 240ml). Print job: silkscreen, matte soft-touch + gold hot stamp. Chunbai/Doria Wang.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "NeVoo"
     },
     {
       "id": "p-nevoo-2",
@@ -15,7 +16,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Approved",
       "notes": "UPC: 860014943829. Formula complete. Bottle delivered. Label: in progress.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "NeVoo"
     },
     {
       "id": "p-nevoo-3",
@@ -23,7 +25,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "UPC: 860014943812. Formula complete. Bottle ordered (LDPE Boston Round 30ml). Silkscreen complete.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "NeVoo"
     },
     {
       "id": "p-nevoo-4",
@@ -31,7 +34,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "3 SKUs. Formula and bottle both Decision Pending/Sourcing. 32 or 64oz bag options for back bar.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "NeVoo"
     },
     {
       "id": "p-nevoo-5",
@@ -39,7 +43,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "3 SKUs. Formula and bottle both Decision Pending/Sourcing.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "NeVoo"
     },
     {
       "id": "p-devman-1",
@@ -47,7 +52,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "Client: Josh Smith. Formula FML-51-ly957 in progress. Bottle sourcing from Chunbai.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Devoted Man"
     },
     {
       "id": "p-dailyrou-1",
@@ -55,7 +61,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "Client: Meredith Baurband. FML-51-ly946. Black glass 30ml dropper. Label: BOPP Gloss. Box: 19pt matte soft-touch. Both completed 5/11/2026. 250 units.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Daily Rou"
     },
     {
       "id": "p-dailyrou-2",
@@ -63,7 +70,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "FML-51-ly947. Black glass 200ml. Label + box both completed 5/11/2026. 250 units. Ready to ship.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Daily Rou"
     },
     {
       "id": "p-dailyrou-3",
@@ -71,7 +79,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "FML-51-ly948. Black glass 200ml, 4 fl oz. Label + box completed 5/11/2026. 250 units.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Daily Rou"
     },
     {
       "id": "p-dailyrou-4",
@@ -79,7 +88,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Ready",
       "notes": "FML-51-ly949. Black glass 200ml. Label + box completed 5/11/2026. 250 units.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Daily Rou"
     },
     {
       "id": "p-dailyrou-5",
@@ -87,7 +97,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "FML-51-ly946. Airless container 50ml. Bottle Decision Pending/Sourcing. Airless pump closure.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Daily Rou"
     },
     {
       "id": "p-nitt-1",
@@ -95,7 +106,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Stability Testing",
       "notes": "Client: Gamze Gurlevik. FML-21-Hy743. Glass square 30ml, samples received. Silkscreen print.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Nitt Beauty"
     },
     {
       "id": "p-nitt-2",
@@ -103,7 +115,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Stability Testing",
       "notes": "FML-21-Hy743. Glass square 30ml, samples received.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Nitt Beauty"
     },
     {
       "id": "p-nitt-3",
@@ -111,7 +124,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "FML-21-Hy743. Glass square 30ml. Bottle sourcing Chunbai.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Nitt Beauty"
     },
     {
       "id": "p-nitt-4",
@@ -119,7 +133,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "Stability Testing",
       "notes": "FML-21-Hy743. Glass square 30ml, samples received.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Nitt Beauty"
     },
     {
       "id": "p-salt-1",
@@ -127,7 +142,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "Client: Andrew Moss. FML-51-ly951. Bottle sourcing in progress.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Salt Spa Yoga"
     },
     {
       "id": "p-salt-2",
@@ -135,7 +151,8 @@ const staticData = {
       "brand": "TCF Client",
       "status": "In Development",
       "notes": "FML-51-ly950/952/953/954/955. 5 SKUs. Bottle and label sourcing pending.",
-      "createdAt": "2025-01-01T09:00:00.000Z"
+      "createdAt": "2025-01-01T09:00:00.000Z",
+      "clientBrand": "Salt Spa Yoga"
     }
   ],
   "formulas": [
@@ -1780,5 +1797,4 @@ const staticData = {
     "lastUpdated": "2026-06-01"
   }
 };
-
 export default staticData;
