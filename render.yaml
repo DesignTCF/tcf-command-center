@@ -18,13 +18,11 @@ services:
         sync: false
       - key: GMAIL_CLIENT_SECRET
         sync: false
-      - key: GMAIL_REFRESH_TOKEN
+      - key: GMAIL_ACCOUNTS
+        value: design@thecosmeticformulary.com,design@paulyinc.com,tcfdesign.katherinefox@gmail.com
+      - key: GMAIL_REDIRECT_URI
         sync: false
-      - key: GDRIVE_CLIENT_ID
-        sync: false
-      - key: GDRIVE_CLIENT_SECRET
-        sync: false
-      - key: GDRIVE_REFRESH_TOKEN
+      - key: DRIVE_REDIRECT_URI
         sync: false
       - key: GDOC_ID
         value: 1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM
