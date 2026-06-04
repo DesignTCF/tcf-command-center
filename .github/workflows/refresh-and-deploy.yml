@@ -47,6 +47,8 @@ jobs:
         run: node scripts/generate-static-data.js
 
       - name: Build for GitHub Pages
+        env:
+          VITE_GH_TOKEN: ${{ secrets.VITE_GH_TOKEN }}
         run: cd client && GH_PAGES=true npm run build
 
       - name: Deploy to GitHub Pages

@@ -28,10 +28,9 @@ function PageLoader() {
 }
 
 function AppInner() {
-  const { reload } = useApp()
   return (
     <div className="h-full flex flex-col bg-bg">
-      <NavV3 onRefresh={reload} />
+      <NavV3 />
       <main className="flex-1 mt-[52px] overflow-hidden">
         <Suspense fallback={<PageLoader />}>
           <Routes>

@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useApp } from '../store/AppContext'
-import { fmtTime } from '../lib/utils'
 import DashboardSearch from './DashboardSearch'
 
 const TABS = [
@@ -14,18 +13,84 @@ const TABS = [
   { to: '/ask',      label: 'Ask AI', accent: true },
 ]
 
-export default function NavV3({ onRefresh }) {
-  const { state } = useApp()
-  const location  = useLocation()
+function timeAgo(iso) {
+  if (!iso) return null
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000)
+  if (diff < 60)   return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+  return `${Math.floor(diff / 86400)}d ago`
+}
 
-  const openTasks     = (state.tasks || []).filter(t => !t.done && t.status !== 'Done').length
-  const openDecisions = (state.decisions || []).filter(d => !d.resolved).length
+function SyncButton({ onSync, syncing, syncedAt, serverUp, syncError }) {
+  const [label, setLabel] = useState(timeAgo(syncedAt))
+
+  // Update "X min ago" label every 30 seconds
+  useEffect(() => {
+    setLabel(timeAgo(syncedAt))
+    const t = setInterval(() => setLabel(timeAgo(syncedAt)), 30000)
+    return () => clearInterval(t)
+  }, [syncedAt])
+
+  return (
+    <div className="flex items-center gap-2 shrink-0">
+
+      {/* Status indicator */}
+      <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        {syncing ? (
+          <>
+            <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse inline-block" />
+            <span>Syncing…</span>
+          </>
+        ) : syncError ? (
+          <>
+            <span className="w-1.5 h-1.5 rounded-full bg-red inline-block" />
+            <span className="text-red text-[10px]">Sync error</span>
+          </>
+        ) : (
+          <>
+            <span className={`w-1.5 h-1.5 rounded-full inline-block ${serverUp ? 'bg-green' : 'bg-amber'}`} />
+            <span>{serverUp ? 'Live' : 'Static'}</span>
+            {label && <span className="text-ink-muted/60">· {label}</span>}
+          </>
+        )}
+      </div>
+
+      {/* Sync All button */}
+      <button
+        onClick={onSync}
+        disabled={syncing}
+        title={serverUp ? 'Re-fetch from Notion, Google Calendar, and Drive sources' : 'Trigger GitHub rebuild with fresh data'}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-semibold transition-all ${
+          syncing
+            ? 'bg-surface border-border text-ink-muted cursor-not-allowed'
+            : 'bg-white border-border text-ink hover:border-teal/50 hover:text-teal hover:bg-teal/5'
+        }`}
+      >
+        <svg
+          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          className={syncing ? 'animate-spin' : ''}
+        >
+          <path d="M23 4v6h-6M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+        Sync All
+      </button>
+    </div>
+  )
+}
+
+export default function NavV3() {
+  const { state, syncAll } = useApp()
+  const location = useLocation()
+
+  const openTasks = (state.tasks || []).filter(t => !t.done && t.status !== 'Done').length
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-[52px] bg-white border-b border-border flex items-center px-6 gap-0 select-none">
 
       {/* Brand */}
-      <div className="flex items-center gap-2.5 mr-6 shrink-0">
+      <div className="flex items-center gap-2.5 mr-5 shrink-0">
         <div className="w-7 h-7 rounded bg-teal flex items-center justify-center">
           <span className="text-white text-[10px] font-bold tracking-wider">TCF</span>
         </div>
@@ -39,11 +104,9 @@ export default function NavV3({ onRefresh }) {
             ? location.pathname === '/'
             : location.pathname.startsWith(t.to)
           return (
-            <NavLink
-              key={t.to}
-              to={t.to}
+            <NavLink key={t.to} to={t.to}
               className={[
-                'relative flex items-center px-3.5 text-[12px] font-medium tracking-wide transition-colors duration-150',
+                'relative flex items-center px-3 text-[12px] font-medium tracking-wide transition-colors duration-150',
                 active
                   ? t.accent ? 'text-teal' : 'text-ink'
                   : t.accent ? 'text-teal/60 hover:text-teal' : 'text-ink-muted hover:text-ink',
@@ -55,9 +118,7 @@ export default function NavV3({ onRefresh }) {
                   {openTasks}
                 </span>
               )}
-              {t.to === '/ask' && (
-                <span className="ml-1.5 text-[9px]">✦</span>
-              )}
+              {t.to === '/ask' && <span className="ml-1 text-[9px]">✦</span>}
               {active && (
                 <span className={`absolute bottom-0 left-2 right-2 h-[2px] rounded-t-sm ${t.accent ? 'bg-teal' : 'bg-ink'}`} />
               )}
@@ -66,20 +127,17 @@ export default function NavV3({ onRefresh }) {
         })}
       </nav>
 
-      {/* ── Search bar ── */}
+      {/* Search */}
       <DashboardSearch />
 
-      {/* Right side */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
-          <span className="w-1.5 h-1.5 rounded-full bg-green inline-block" />
-          Notion
-        </div>
-        <span className="text-[11px] text-ink-muted">
-          {state.loading ? 'Syncing…' : state.syncedAt ? `Synced ${fmtTime(state.syncedAt)}` : '—'}
-        </span>
-        <button onClick={onRefresh} className="btn-icon text-base" title="Refresh">↻</button>
-      </div>
+      {/* Sync */}
+      <SyncButton
+        onSync={syncAll}
+        syncing={state.syncing}
+        syncedAt={state.syncedAt}
+        serverUp={state.serverUp}
+        syncError={state.syncError}
+      />
     </header>
   )
 }
