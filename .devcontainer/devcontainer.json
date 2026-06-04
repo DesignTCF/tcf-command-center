@@ -1,0 +1,19 @@
+{
+  "name": "TCF Command Center",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "forwardPorts": [3001],
+  "portsAttributes": {
+    "3001": {
+      "label": "TCF Dashboard",
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "cd server && npm install && cd ../client && npm install && npm run build",
+  "postStartCommand": "cd server && node index.js &",
+  "customizations": {
+    "vscode": {
+      "extensions": ["esbenp.prettier-vscode"]
+    }
+  }
+}

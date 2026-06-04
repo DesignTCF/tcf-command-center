@@ -1,0 +1,65 @@
+name: Refresh Data & Deploy
+
+on:
+  schedule:
+    # Runs at 6am, 10am, 2pm, 7pm EST (11, 15, 19, 00 UTC)
+    - cron: '0 11 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 19 * * *'
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  refresh-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+
+      - name: Install server deps
+        run: cd server && npm install
+
+      - name: Fetch fresh data from all sources
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_TODO_DB_ID: ${{ secrets.NOTION_TODO_DB_ID }}
+          GITHUB_TOKEN_TCF: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_USER: DesignTCF
+        run: node scripts/fetch-data.js
+
+      - name: Install client deps
+        run: cd client && npm install
+
+      - name: Build for GitHub Pages
+        run: cd client && GH_PAGES=true npm run build
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config user.name "TCF Bot"
+          git config user.email "design@thecosmeticformulary.com"
+
+          mkdir -p /tmp/gh-deploy
+          cp -r client-dist-gh/. /tmp/gh-deploy/
+          cp client-dist-gh/index.html /tmp/gh-deploy/404.html
+          touch /tmp/gh-deploy/.nojekyll
+
+          git fetch origin gh-pages
+          git checkout gh-pages
+          find . -maxdepth 1 ! -name .git ! -name . -exec rm -rf {} +
+          cp -r /tmp/gh-deploy/. .
+          git add -A
+          git diff --cached --quiet || git commit -m "Auto refresh: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push origin gh-pages
+          git checkout main
