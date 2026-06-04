@@ -43,6 +43,9 @@ jobs:
       - name: Install client deps
         run: cd client && npm install
 
+      - name: Bake fresh data into staticData.js
+        run: node scripts/generate-static-data.js
+
       - name: Build for GitHub Pages
         run: cd client && GH_PAGES=true npm run build
 
