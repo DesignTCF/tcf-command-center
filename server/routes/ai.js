@@ -93,7 +93,12 @@ ${context.decisions?.filter(d => !d.resolved).length ? `\nOpen decisions: ${cont
 
     const docContent = context?.docText ? `\nGOOGLE DOCUMENT CONTENTS:\n${context.docText.slice(0, 6000)}` : ''
 
-    // Load connected Drive sources
+    // Drive file loaded directly into chat
+    const driveFileContext = context?.driveFile
+      ? `\n\nDRIVE FILE IN CONTEXT — "${context.driveFile.name}":\n${context.driveFile.content?.slice(0, 20000)}`
+      : ''
+
+    // Load connected Drive sources (pinned public links)
     let sourcesContext = ''
     try {
       const fs = require('fs'), path = require('path')
@@ -107,6 +112,7 @@ ${context.decisions?.filter(d => !d.resolved).length ? `\nOpen decisions: ${cont
     const systemPrompt = `${TCF_CONTEXT}
 ${dashboardSummary}
 ${docContent}
+${driveFileContext}
 ${sourcesContext}
 
 Answer questions concisely and directly. Make recommendations when asked. Never claim to have made changes to the dashboard — you can only suggest. Format responses with line breaks for readability. Use bullet points when listing items.`

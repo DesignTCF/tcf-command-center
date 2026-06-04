@@ -31,3 +31,4 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+data/drive-tokens.json
