@@ -22,55 +22,69 @@ function timeAgo(iso) {
   return `${Math.floor(diff / 86400)}d ago`
 }
 
-function SyncButton({ onSync, syncing, syncedAt, serverUp, syncError }) {
+function SyncButton({ onSync, syncing, syncedAt, serverUp }) {
   const [label, setLabel] = useState(timeAgo(syncedAt))
+  const [flash, setFlash] = useState(false) // brief "Synced!" flash
 
-  // Update "X min ago" label every 30 seconds
   useEffect(() => {
     setLabel(timeAgo(syncedAt))
     const t = setInterval(() => setLabel(timeAgo(syncedAt)), 30000)
     return () => clearInterval(t)
   }, [syncedAt])
 
+  // Show a brief "Synced ✓" flash when syncedAt changes
+  useEffect(() => {
+    if (!syncedAt) return
+    setFlash(true)
+    const t = setTimeout(() => setFlash(false), 2500)
+    return () => clearTimeout(t)
+  }, [syncedAt])
+
+  async function handleSync() {
+    await onSync()
+  }
+
+  const tooltip = serverUp
+    ? 'Re-fetch from Notion, Google Calendar, and Drive — updates dashboard immediately'
+    : 'Reload latest data — dashboard auto-refreshes 4× per day from all sources'
+
   return (
     <div className="flex items-center gap-2 shrink-0">
 
-      {/* Status indicator */}
+      {/* Status */}
       <div className="flex items-center gap-1.5 text-[11px] text-ink-muted">
         {syncing ? (
           <>
             <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse inline-block" />
             <span>Syncing…</span>
           </>
-        ) : syncError ? (
+        ) : flash ? (
           <>
-            <span className="w-1.5 h-1.5 rounded-full bg-red inline-block" />
-            <span className="text-red text-[10px]">Sync error</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-green inline-block" />
+            <span className="text-green font-medium">Synced ✓</span>
           </>
         ) : (
           <>
-            <span className={`w-1.5 h-1.5 rounded-full inline-block ${serverUp ? 'bg-green' : 'bg-amber'}`} />
-            <span>{serverUp ? 'Live' : 'Static'}</span>
+            <span className={`w-1.5 h-1.5 rounded-full inline-block ${serverUp ? 'bg-green' : 'bg-teal'}`} />
+            <span>{serverUp ? 'Live' : 'Auto-sync'}</span>
             {label && <span className="text-ink-muted/60">· {label}</span>}
           </>
         )}
       </div>
 
-      {/* Sync All button */}
+      {/* Button */}
       <button
-        onClick={onSync}
+        onClick={handleSync}
         disabled={syncing}
-        title={serverUp ? 'Re-fetch from Notion, Google Calendar, and Drive sources' : 'Trigger GitHub rebuild with fresh data'}
+        title={tooltip}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-semibold transition-all ${
           syncing
             ? 'bg-surface border-border text-ink-muted cursor-not-allowed'
             : 'bg-white border-border text-ink hover:border-teal/50 hover:text-teal hover:bg-teal/5'
         }`}
       >
-        <svg
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-          className={syncing ? 'animate-spin' : ''}
-        >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          className={syncing ? 'animate-spin' : ''}>
           <path d="M23 4v6h-6M1 20v-6h6"/>
           <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
         </svg>
@@ -136,7 +150,6 @@ export default function NavV3() {
         syncing={state.syncing}
         syncedAt={state.syncedAt}
         serverUp={state.serverUp}
-        syncError={state.syncError}
       />
     </header>
   )

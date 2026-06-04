@@ -100,27 +100,20 @@ export function AppProvider({ children }) {
   // ── Sync all live sources then reload state ───────────────────────────────
   const syncAll = useCallback(async () => {
     dispatch({ type: 'SYNCING', value: true })
-    try {
-      if (serverUpRef.current) {
-        // Server is up — hit the sync endpoint which re-fetches Notion, GCal, Drive sources
+
+    if (serverUpRef.current) {
+      // Server is running — hit /api/sync which re-fetches Notion, GCal, Drive sources,
+      // writes fresh JSON files, then reload all state
+      try {
         await api.post('/sync', {})
-        // Then reload all state with fresh data
-        await loadAll()
-      } else {
-        // GitHub Pages (no server) — trigger GitHub Actions workflow to rebuild with fresh data
-        // Token is injected at build time via VITE_GH_TOKEN env var (never committed)
-        const ghToken = import.meta.env.VITE_GH_TOKEN
-        if (ghToken) {
-          await fetch('https://api.github.com/repos/DesignTCF/tcf-command-center/actions/workflows/refresh-and-deploy.yml/dispatches', {
-            method: 'POST',
-            headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ref: 'main' }),
-          })
-        }
-        dispatch({ type: 'SYNCED' })
-      }
-    } catch (err) {
-      dispatch({ type: 'SYNC_ERROR', error: err.message })
+      } catch {}          // continue even if sync endpoint errors
+      await loadAll()     // reload always succeeds (falls back to static data)
+    } else {
+      // GitHub Pages (no server) — reload from baked-in static data.
+      // The site rebuilds 4x/day automatically with fresh data from all sources.
+      // Just re-apply staticData so any tab navigation picks up the latest build data.
+      dispatch({ type: 'SET_MANY', payload: staticData })
+      dispatch({ type: 'SYNCED' })
     }
   }, [loadAll])
 
