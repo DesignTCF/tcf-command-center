@@ -57,10 +57,10 @@ jobs:
           touch /tmp/gh-deploy/.nojekyll
 
           git fetch origin gh-pages
+          git stash --include-untracked
           git checkout gh-pages
           find . -maxdepth 1 ! -name .git ! -name . -exec rm -rf {} +
           cp -r /tmp/gh-deploy/. .
           git add -A
           git diff --cached --quiet || git commit -m "Auto refresh: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin gh-pages
-          git checkout main
