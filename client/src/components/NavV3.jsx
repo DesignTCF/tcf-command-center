@@ -7,7 +7,7 @@ const TABS = [
   { to: '/', label: 'Home' },
   { to: '/brands', label: 'Brands' },
   { to: '/work', label: 'Work' },
-  { to: '/content', label: 'Content' },
+  { to: '/calendar', label: 'Calendar' },
   { to: '/alibaba', label: 'Alibaba' },
   { to: '/ask', label: 'Ask AI', accent: true },
 ]

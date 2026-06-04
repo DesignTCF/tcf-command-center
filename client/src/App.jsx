@@ -8,15 +8,15 @@ import AIChatPanel from './components/AIChatPanel'
 const HomeV3    = lazy(() => import('./pages/HomeV3'))
 const BrandsV3  = lazy(() => import('./pages/BrandsV3'))
 const WorkV3    = lazy(() => import('./pages/WorkV3'))
-const ContentV3 = lazy(() => import('./pages/ContentV3'))
-const AskV3     = lazy(() => import('./pages/AskV3'))
+const CalendarPage = lazy(() => import('./pages/CalendarPage'))
+const AskV3        = lazy(() => import('./pages/AskV3'))
 
-// Legacy pages (accessible via /legacy/* if needed)
-const Files         = lazy(() => import('./pages/Files'))
-const Intelligence  = lazy(() => import('./pages/Intelligence'))
-const Links         = lazy(() => import('./pages/Links'))
-const Alibaba       = lazy(() => import('./pages/Alibaba'))
-const CalendarPage  = lazy(() => import('./pages/CalendarPage'))
+// Legacy pages
+const Files        = lazy(() => import('./pages/Files'))
+const Intelligence = lazy(() => import('./pages/Intelligence'))
+const Links        = lazy(() => import('./pages/Links'))
+const Alibaba      = lazy(() => import('./pages/Alibaba'))
+const ContentV3    = lazy(() => import('./pages/ContentV3'))
 
 function PageLoader() {
   return (
@@ -38,14 +38,14 @@ function AppInner() {
             <Route path="/"         element={<HomeV3 />} />
             <Route path="/brands"   element={<BrandsV3 />} />
             <Route path="/work"     element={<WorkV3 />} />
-            <Route path="/content"  element={<ContentV3 />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/ask"      element={<AskV3 />} />
-            {/* Legacy tools still accessible */}
+            {/* Legacy */}
+            <Route path="/content"  element={<ContentV3 />} />
             <Route path="/files"    element={<Files />} />
             <Route path="/intelligence" element={<Intelligence />} />
             <Route path="/links"    element={<Links />} />
             <Route path="/alibaba"  element={<Alibaba />} />
-            <Route path="/calendar" element={<CalendarPage />} />
           </Routes>
         </Suspense>
       </main>

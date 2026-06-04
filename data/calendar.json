@@ -1,1 +1,125 @@
-[]
+[
+  {
+    "id": "cal-dailyrou-launch",
+    "title": "Daily Rou — Product Launch Deadline",
+    "date": "2026-06-30",
+    "type": "Deadline",
+    "notes": "All 4 SKUs (THD Serum, Cream Cleanser, Oil Cleanser, Gel Cleanser) must be ready to ship. Bottles + boxes already received from Chunbai and Your Box Solution.",
+    "brand": "Daily Rou",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-nevoo-print-samples",
+    "title": "NeVoo — Print Samples from Chunbai",
+    "date": "2026-06-15",
+    "type": "Supplier Follow-Up",
+    "notes": "Scalp Scrub 8oz + 2oz silkscreen print samples due mid-June. Review and approve before full production run of 5,000 units.",
+    "brand": "NeVoo",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-nevoo-website",
+    "title": "NeVoo Website — Launch Deadline",
+    "date": "2026-07-15",
+    "type": "Deadline",
+    "notes": "NeVoo website must be live. Coordinate with Molly Smith. Product images, copy, and store architecture must be finalized.",
+    "brand": "NeVoo",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-tcf-website-review",
+    "title": "TCF Website Direction Review",
+    "date": "2026-06-07",
+    "type": "Meeting",
+    "notes": "Review visual direction, homepage structure, catalog architecture, typography, and brand tone. Pull references and initial mockup concept.",
+    "brand": "TCF",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-devman-rfq",
+    "title": "Devoted Man — Beard Scrub RFQ to Chunbai",
+    "date": "2026-06-20",
+    "type": "Supplier Follow-Up",
+    "notes": "Send RFQ to Doria Wang once formula is complete and bottle spec is decided.",
+    "brand": "Devoted Man",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-salt-rfq",
+    "title": "Salt Spa & Yoga — Packaging RFQ",
+    "date": "2026-06-25",
+    "type": "Supplier Follow-Up",
+    "notes": "Send RFQ for 6 SKU containers (sugar scrubs + massage oil) once client brief from Andrew Moss is received.",
+    "brand": "Salt Spa Yoga",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-nitt-samples",
+    "title": "Nitt Beauty — Sample Review with Gamze",
+    "date": "2026-06-18",
+    "type": "Meeting",
+    "notes": "Review HA Serum, Cream Cleanser, Face Cream, and Gel Cleanser samples. Discuss bottle direction and silkscreen artwork.",
+    "brand": "Nitt Beauty",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-tcf-bottle-render",
+    "title": "TCF Isopropyl Bottle — Production Render",
+    "date": "2026-06-12",
+    "type": "Task",
+    "notes": "Pull Pauly Inc. mockup and adapt to TCF branding. Build production-ready render for isopropyl bottle.",
+    "brand": "TCF",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-nevoo-print-approval",
+    "title": "NeVoo — Print Samples Approval Deadline",
+    "date": "2026-06-20",
+    "type": "Deadline",
+    "notes": "Approve or reject Chunbai print samples for NeVoo Scalp Scrub. Full production of 5,000 units begins after approval.",
+    "brand": "NeVoo",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-tcf-bottle-presentation",
+    "title": "TCF — Bottle Direction Presentation",
+    "date": "2026-06-22",
+    "type": "Meeting",
+    "notes": "Deliver bottle direction presentation. Map formulas to bottles, include dieline codes and Chunbai sourcing.",
+    "brand": "TCF",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-tcf-sops",
+    "title": "TCF — Manufacturing SOPs Draft Due",
+    "date": "2026-07-01",
+    "type": "Task",
+    "notes": "Write SOPs for manufacturing processes.",
+    "brand": "TCF",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-jul4",
+    "title": "4th of July — Office Closed",
+    "date": "2026-07-04",
+    "type": "Personal",
+    "notes": "Independence Day. No supplier follow-ups or client meetings.",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-thanksgiving",
+    "title": "Thanksgiving — Office Closed",
+    "date": "2026-11-26",
+    "type": "Personal",
+    "notes": "Thanksgiving Day.",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  },
+  {
+    "id": "cal-christmas",
+    "title": "Christmas — Office Closed",
+    "date": "2026-12-25",
+    "type": "Personal",
+    "notes": "Christmas Day.",
+    "createdAt": "2026-06-04T00:00:00.000Z"
+  }
+]
