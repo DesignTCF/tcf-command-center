@@ -9,6 +9,7 @@ const TABS = [
   { to: '/brands',   label: 'Brands' },
   { to: '/work',     label: 'Work' },
   { to: '/calendar', label: 'Calendar' },
+  { to: '/drive',    label: 'Drive' },
   { to: '/alibaba',  label: 'Alibaba' },
   { to: '/ask',      label: 'Ask AI', accent: true },
 ]

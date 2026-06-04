@@ -35,6 +35,7 @@ const importItems     = read('import-items.json')
 const alibabaCo       = read('alibaba-convos.json')
 const notionPageTasks = read('notion-page-tasks.json')
 const links           = read('links.json')
+const driveHub        = read('drive-hub.json')
 
 // Google Calendar — pull from cache
 const gcalCache  = read('gcal-cache.json', { events: [] })
@@ -67,6 +68,7 @@ const staticData = {
   notionPageTasks,
   links,
   gcalEvents,
+  driveHub,
   // placeholders — loaded live when server is up
   tasks:        [],
   notionContent:[],

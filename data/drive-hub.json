@@ -1,0 +1,72 @@
+[
+  {
+    "id": "grp-brands",
+    "group": "Brands",
+    "items": [
+      { "id": "f-brands-root",   "name": "BRANDS",        "desc": "All brand folders",               "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-tcf",           "name": "TCF",           "desc": "Logos, labels, brand assets",     "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-nevoo",         "name": "NeVoo",         "desc": "Brand assets",                    "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-dailyrou",      "name": "Daily Rou",     "desc": "Packaging, artwork, labels",      "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-nittbeauty",    "name": "Nitt Beauty",   "desc": "Brand direction, samples",        "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-devman",        "name": "Devoted Man",   "desc": "Beard scrub, packaging",          "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-saltspayoga",   "name": "Salt Spa Yoga", "desc": "Sugar scrub, massage oil",        "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-skinaxis",      "name": "Skin Axis",     "desc": "Concepts, product line",          "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-rinserepeat",   "name": "Rinse & Repeat","desc": "Catalog, packaging, logo designs", "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" }
+    ]
+  },
+  {
+    "id": "grp-formulation",
+    "group": "Formulation",
+    "items": [
+      { "id": "f-formula-root",  "name": "FORMULATION",          "desc": "All formula files",              "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-formula-nevoo", "name": "NeVoo Formulas",       "desc": "NeVoo formulation files",        "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-formula-tracker","name": "Formulation Tracker", "desc": "Master tracking spreadsheet",   "url": "", "account": "design@thecosmeticformulary.com", "type": "sheet" }
+    ]
+  },
+  {
+    "id": "grp-operations",
+    "group": "Operations & Tracking",
+    "items": [
+      { "id": "f-client-tracker","name": "Client Status Tracker","desc": "All client product status",     "url": "https://docs.google.com/spreadsheets/d/1hrnC8aDPM7fxZv1YygPgg4-JjDIZAkk9/edit", "account": "design@thecosmeticformulary.com", "type": "sheet" },
+      { "id": "f-bottle-map",    "name": "TCF Bottle Map & SKUs","desc": "Full bottle SKU library, dielines","url": "https://docs.google.com/spreadsheets/d/1W9FODixEISSG2OcaALOUVXqDZ76EaZk7/edit", "account": "design@thecosmeticformulary.com", "type": "sheet" },
+      { "id": "f-manufacturing", "name": "Manufacturing",        "desc": "Production SOPs, schedules",    "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-purchasing",    "name": "Purchasing & POs",     "desc": "Purchase orders, RFQs",         "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" }
+    ]
+  },
+  {
+    "id": "grp-packaging",
+    "group": "Packaging & Design",
+    "items": [
+      { "id": "f-pkg-root",      "name": "PACKAGING",           "desc": "All packaging files",           "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-dielines",      "name": "Dielines",            "desc": "All dieline files by supplier",  "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-artwork",       "name": "Artwork & Labels",    "desc": "Label artwork, print-ready files","url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-mockups",       "name": "Mockups & Renders",   "desc": "Product mockups, 3D renders",   "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" }
+    ]
+  },
+  {
+    "id": "grp-tcf-kingstreet",
+    "group": "TCF King Street",
+    "items": [
+      { "id": "f-kingstreet",    "name": "TCF King Street",     "desc": "King Street location folders",  "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-sipformulate",  "name": "Sip & Formulate",     "desc": "Sip & Formulate space",         "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" },
+      { "id": "f-retail",        "name": "Retail",              "desc": "Retail concept & plans",        "url": "", "account": "design@thecosmeticformulary.com", "type": "folder" }
+    ]
+  },
+  {
+    "id": "grp-paulyinc",
+    "group": "Pauly Inc.",
+    "items": [
+      { "id": "f-pauly-root",    "name": "Pauly Inc.",          "desc": "All Pauly Inc. files",          "url": "", "account": "design@paulyinc.com", "type": "folder" },
+      { "id": "f-pauly-isopropyl","name": "Isopropyl Bottle",   "desc": "Bottle mockups, renders",       "url": "", "account": "design@paulyinc.com", "type": "folder" },
+      { "id": "f-pauly-brand",   "name": "Pauly Brand Assets",  "desc": "Logos, brand guidelines",      "url": "", "account": "design@paulyinc.com", "type": "folder" }
+    ]
+  },
+  {
+    "id": "grp-personal",
+    "group": "Katherine's Files",
+    "items": [
+      { "id": "f-kf-notes",      "name": "Katherine's Notes",   "desc": "Personal notes, strategy docs", "url": "https://docs.google.com/document/d/1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM/edit", "account": "tcfdesign.katherinefox@gmail.com", "type": "doc" },
+      { "id": "f-kf-personal",   "name": "Personal Drive",      "desc": "Personal files",                "url": "", "account": "tcfdesign.katherinefox@gmail.com", "type": "folder" }
+    ]
+  }
+]

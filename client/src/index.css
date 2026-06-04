@@ -101,6 +101,16 @@
   .btn-icon:hover { background: #EEEEEE; color: #1A1A1A; }
 
   /* Inputs */
+  .label-sm {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #58595b;
+    margin-bottom: 4px;
+  }
+
   .input-field {
     background: #FFFFFF;
     border: 1px solid #CCCCCC;

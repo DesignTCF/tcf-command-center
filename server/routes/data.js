@@ -80,6 +80,30 @@ makeCRUD('alibaba-convos.json')
 makeCRUD('links.json')
 makeCRUD('notion-page-tasks.json')
 
+// Drive Hub (nested groups structure — save whole array at once)
+router.get('/drive-hub', (req, res) => {
+  res.json(readJSON('drive-hub.json', []))
+})
+router.post('/drive-hub', (req, res) => {
+  const data = Array.isArray(req.body) ? req.body : []
+  writeJSON('drive-hub.json', data)
+  res.json({ ok: true })
+})
+
+// Daily recap
+router.get('/daily-recap', (req, res) => {
+  const date = req.query.date || new Date().toISOString().slice(0, 10)
+  const all = readJSON('daily-recap.json', {})
+  res.json(all[date] || [])
+})
+router.post('/daily-recap', (req, res) => {
+  const { date, items } = req.body
+  const all = readJSON('daily-recap.json', {})
+  all[date] = items
+  writeJSON('daily-recap.json', all)
+  res.json({ ok: true })
+})
+
 // Brand health (singleton object)
 router.get('/brand-health', (req, res) => {
   res.json(readJSON('brandHealth.json', { streak: 0, lastUpdated: null }))

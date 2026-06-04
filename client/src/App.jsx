@@ -9,6 +9,7 @@ const HomeV3    = lazy(() => import('./pages/HomeV3'))
 const BrandsV3  = lazy(() => import('./pages/BrandsV3'))
 const WorkV3    = lazy(() => import('./pages/WorkV3'))
 const CalendarPage = lazy(() => import('./pages/CalendarPage'))
+const DrivePage    = lazy(() => import('./pages/DrivePage'))
 const AskV3        = lazy(() => import('./pages/AskV3'))
 
 // Legacy pages
@@ -39,6 +40,7 @@ function AppInner() {
             <Route path="/brands"   element={<BrandsV3 />} />
             <Route path="/work"     element={<WorkV3 />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/drive"    element={<DrivePage />} />
             <Route path="/ask"      element={<AskV3 />} />
             {/* Legacy */}
             <Route path="/content"  element={<ContentV3 />} />
