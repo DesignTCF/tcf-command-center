@@ -37,6 +37,7 @@ jobs:
           NOTION_TODO_DB_ID: ${{ secrets.NOTION_TODO_DB_ID }}
           GITHUB_TOKEN_TCF: ${{ secrets.TOKEN_GITHUB }}
           GITHUB_USER: DesignTCF
+          NODE_PATH: ${{ github.workspace }}/server/node_modules
         run: node scripts/fetch-data.js
 
       - name: Install client deps

@@ -2,7 +2,8 @@
 // Fetches fresh data from all live sources and writes to data/ JSON files
 // Run before each GitHub Pages build to keep static site current
 
-require('dotenv').config({ path: '../.env' })
+// env vars come from GitHub Secrets in CI, or .env locally
+try { require('dotenv').config({ path: '../.env' }) } catch {}
 const fs = require('fs')
 const path = require('path')
 const https = require('https')
