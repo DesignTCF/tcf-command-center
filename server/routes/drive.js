@@ -41,6 +41,10 @@ function getFileType(mimeType, name) {
   return 'file'
 }
 
+// SAFETY: delete operations on Google Drive are permanently blocked at the route level.
+// No file, folder, or Drive item may ever be deleted through this server.
+router.delete('/files/*', (req, res) => res.status(403).json({ error: 'Delete operations are disabled. Files may not be deleted through this dashboard.' }))
+
 // GET /api/drive/status — which accounts are connected
 router.get('/status', (req, res) => {
   const tokens = readTokens()

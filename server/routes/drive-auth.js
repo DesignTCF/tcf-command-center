@@ -6,7 +6,8 @@ const path = require('path')
 
 const TOKENS_FILE = path.join(__dirname, '../../data/drive-tokens.json')
 const SCOPES = [
-  'https://www.googleapis.com/auth/drive.readonly',
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/drive.file',
   'https://www.googleapis.com/auth/userinfo.email',
 ]
 
@@ -71,7 +72,7 @@ router.get('/', (req, res) => {
     <p class="sub">Connect all 3 accounts to browse, search, and read Drive files in the dashboard.</p>
 
     <div class="scope-note">
-      📁 Read-only access — the dashboard can view and search your files but cannot modify anything.
+      📁 Full access — the dashboard can view, search, create, edit, and move your files.
     </div>
 
     ${accounts.map(a => `

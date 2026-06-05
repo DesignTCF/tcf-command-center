@@ -8,7 +8,6 @@ const TOKENS_FILE = path.join(__dirname, '../../data/gmail-tokens.json')
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/gmail.compose',
-  'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/userinfo.email',
 ]
 
