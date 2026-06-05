@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useApp } from '../store/AppContext'
 import api from '../lib/api'
 import { fmtDate, fmtDateShort, isOverdue } from '../lib/utils'
@@ -228,194 +228,79 @@ function AddTaskModal({ onClose }) {
   )
 }
 
-// ─── Done status detection ────────────────────────────────────────────────────
-const DONE_STATUSES = new Set(['done', 'complete', 'completed', 'finished', 'closed'])
-function isDone(task) {
-  return task.done || DONE_STATUSES.has((task.status || '').toLowerCase())
-}
-
-// ─── To-do block row (read-only — never writes to Notion) ────────────────────
-function TodoBlock({ block, indent = 0 }) {
-  const checked = block.checked
-  return (
-    <>
-      <div
-        className={`flex items-start gap-2.5 py-2 px-4 border-b border-border last:border-0 ${checked ? 'opacity-40' : ''}`}
-        style={{ paddingLeft: 16 + indent * 20 }}
-      >
-        {/* Read-only checkbox indicator */}
-        <div className={`mt-0.5 w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center ${
-          checked ? 'bg-teal border-teal' : 'border-border'
-        }`}>
-          {checked && (
-            <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2">
-              <path d="M1.5 5l2.5 2.5 5-5"/>
-            </svg>
-          )}
-        </div>
-        <span className={`text-[12.5px] leading-snug flex-1 ${checked ? 'line-through text-ink-muted' : 'text-ink'}`}>
-          {block.text || '(empty)'}
-        </span>
-      </div>
-      {(block.children || []).map(child => (
-        <TodoBlock key={child.id} block={child} indent={indent + 1} />
-      ))}
-    </>
-  )
-}
-
-// ─── Notion task panel (read-only) ───────────────────────────────────────────
-function NotionTaskPanel({ task }) {
-  const [expanded, setExpanded] = useState(true)
-  const [blocks, setBlocks] = useState(task.blocks || [])
-  const [loading, setLoading] = useState(false)
-
-  // On mount: if server is up and blocks weren't baked in, fetch them
-  useEffect(() => {
-    if (blocks.length === 0 && !isDone(task)) {
-      setLoading(true)
-      api.get(`/notion/tasks/${task.id}/blocks`)
-        .then(b => { if (b?.length) setBlocks(b) })
-        .catch(() => {})
-        .finally(() => setLoading(false))
-    }
-  }, [task.id])
-
-  const todoBlocks = blocks.filter(b => b.type === 'to_do')
-  const noteBlocks = blocks.filter(b => b.type === 'paragraph' && b.text)
-  const openCount  = todoBlocks.filter(b => !b.checked).length
-  const otherBlocks = blocks.filter(b => b.type !== 'to_do' && b.type !== 'paragraph')
-
-  return (
-    <div className="panel overflow-hidden">
-      {/* Header */}
-      <div
-        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-surface2 transition-colors border-b border-border"
-        onClick={() => setExpanded(v => !v)}
-      >
-        <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-semibold text-ink leading-snug">{task.title}</div>
-          {noteBlocks[0] && (
-            <div className="text-[11px] text-ink-muted mt-0.5 truncate">{noteBlocks[0].text}</div>
-          )}
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {openCount > 0 && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface2 text-ink-muted">
-              {openCount} open
-            </span>
-          )}
-          <StatusBadge status={task.status} />
-          {task.url && (
-            <a href={task.url} target="_blank" rel="noreferrer"
-              onClick={e => e.stopPropagation()}
-              title="Open in Notion"
-              className="text-[10px] text-ink-muted hover:text-teal">↗</a>
-          )}
-          <span className="text-ink-muted text-[11px]">{expanded ? '▲' : '▼'}</span>
-        </div>
-      </div>
-
-      {/* Body */}
-      {expanded && (
-        <div>
-          {loading && <div className="px-4 py-3 text-[11px] text-ink-muted">Loading from Notion…</div>}
-
-          {!loading && blocks.length === 0 && (
-            <div className="px-4 py-3 text-[11px] text-ink-muted italic">
-              No items — click ↗ to view in Notion
-            </div>
-          )}
-
-          {/* Additional note paragraphs */}
-          {noteBlocks.slice(1).map(b => (
-            <div key={b.id} className="px-4 py-2 text-[11.5px] text-ink-muted border-b border-border bg-surface/40 italic">
-              {b.text}
-            </div>
-          ))}
-
-          {/* To-do items — read-only */}
-          {todoBlocks.map(block => (
-            <TodoBlock key={block.id} block={block} />
-          ))}
-
-          {/* Other block types */}
-          {otherBlocks.map(b => b.text && (
-            <div key={b.id} className="flex items-start gap-2 px-4 py-1.5 border-b border-border last:border-0">
-              <span className="text-[12px] text-ink-muted">{b.text}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-
 // ─── Tasks Tab ───────────────────────────────────────────────────────────────
 
 function TasksTab() {
   const { state } = useApp()
   const [showDone, setShowDone] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
 
-  const allTasks    = state.tasks || []
-  const activeTasks = allTasks.filter(t => !isDone(t))
-  const doneTasks   = allTasks.filter(t => isDone(t))
-  const totalTodos  = activeTasks.reduce((n, t) =>
-    n + (t.blocks || []).filter(b => b.type === 'to_do' && !b.checked).length, 0)
+  // Notion live tasks
+  const inProgress = (state.tasks || []).filter(t => t.status === 'In progress')
+  const notStarted = (state.tasks || []).filter(t => t.status === 'Not started')
+  const done = (state.tasks || []).filter(t => t.status === 'Done')
+
+  // TCF project tasks from Notion page content — grouped by category
+  const pageTasks = state.notionPageTasks || []
+  const tcfProjects = {
+    'TCF House Brand': pageTasks.filter(t => ['t-tcf-1','t-tcf-2','t-tcf-3','t-tcf-4','t-tcf-5','t-tcf-6','t-tcf-7','t-tcf-8'].includes(t.id)),
+    'TCF Website': pageTasks.filter(t => t.id.startsWith('t-web-')),
+    'TCF Company Audit': pageTasks.filter(t => t.id.startsWith('t-audit-')),
+    'Skin Axis Packaging': pageTasks.filter(t => t.id.startsWith('t-skin-')),
+    'Salt Spa & Yoga': pageTasks.filter(t => t.id.startsWith('t-salt-')),
+    'Sip & Formulate': pageTasks.filter(t => t.id.startsWith('t-sip-')),
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
-        <span className="text-[11px] text-ink-muted font-medium">
-          Live from Notion · {activeTasks.length} open sections · {totalTodos} to-dos
-        </span>
-        <span className="text-[10px] text-ink-muted/60 ml-1">— read only, use Sync All to refresh</span>
+    <div className="flex flex-col gap-6">
+      {/* Notion Live Tasks */}
+      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <TaskColumn label="In Progress" tasks={inProgress} count={inProgress.length} />
+        <TaskColumn label="Not Started" tasks={notStarted} count={notStarted.length} />
       </div>
 
-      {/* Open task panels */}
-      {activeTasks.length === 0 && (
-        <div className="panel p-8 text-center text-ink-muted text-sm">
-          No open tasks — click Sync All to refresh from Notion
+      {/* TCF Project Tasks from Notion page content */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="section-title">TCF Open Items by Project</div>
+          <span className="text-[10px] text-ink-muted">Pulled from Notion • {pageTasks.filter(t => t.status !== 'Done').length} open</span>
         </div>
-      )}
-
-      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
-        {activeTasks.map(task => (
-          <NotionTaskPanel key={task.id} task={task} />
-        ))}
-      </div>
-
-      {/* Done — collapsible */}
-      {doneTasks.length > 0 && (
-        <div className="panel overflow-hidden mt-2">
-          <div
-            className="flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-surface2 transition-colors"
-            onClick={() => setShowDone(v => !v)}
-          >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Completed in Notion</span>
-            <span className="text-[10px] text-ink-muted bg-surface2 px-1.5 py-0.5 rounded font-semibold">{doneTasks.length}</span>
-            <span className="ml-auto text-[10px] text-ink-muted">{showDone ? '▲ Hide' : '▼ Show'}</span>
-          </div>
-          {showDone && (
-            <div className="divide-y divide-border">
-              {doneTasks.map(t => (
-                <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 opacity-40">
-                  <span className="text-teal text-[12px] shrink-0">✓</span>
-                  <span className="text-[12.5px] text-ink line-through flex-1">{t.title}</span>
-                  {t.url && (
-                    <a href={t.url} target="_blank" rel="noreferrer"
-                      className="text-[10px] text-ink-muted hover:text-teal">↗</a>
-                  )}
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+          {Object.entries(tcfProjects).map(([projectName, tasks]) => {
+            const open = tasks.filter(t => t.status !== 'Done' && t.status !== 'Complete')
+            if (open.length === 0) return null
+            return (
+              <div key={projectName} className="panel">
+                <div className="panel-header">
+                  <div className="text-sm font-semibold text-ink">{projectName}</div>
+                  <span className="text-[10px] bg-surface2 text-ink-muted px-1.5 py-0.5 rounded font-semibold">{open.length} open</span>
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="divide-y divide-border">
+                  {open.map(t => (
+                    <div key={t.id} className="px-4 py-2.5 flex items-start gap-2.5">
+                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${t.priority === 'High' ? 'bg-amber' : t.priority === 'Medium' ? 'bg-teal' : 'bg-surface3'}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-ink leading-snug">{t.title}</div>
+                        {t.notes && <div className="text-[11px] text-ink-muted mt-0.5 truncate">{t.notes}</div>}
+                      </div>
+                      <span className="text-[9.5px] text-ink-muted shrink-0">{t.category}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
-      )}
+      </div>
+
+      <div className="panel p-4" style={{ borderColor: '#D8D8D8' }}>
+        <TaskColumn label="Completed" tasks={done} count={done.length} dim collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
+      </div>
+
+      <div>
+        <button className="btn-primary text-xs px-3 py-2" onClick={() => setAddOpen(true)}>+ Add to Notion</button>
+      </div>
+      {addOpen && <AddTaskModal onClose={() => setAddOpen(false)} />}
     </div>
   )
 }

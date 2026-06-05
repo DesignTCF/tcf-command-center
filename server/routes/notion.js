@@ -6,7 +6,7 @@ function getClient() {
   return new Client({ auth: process.env.NOTION_TOKEN })
 }
 
-const TODO_DB_ID = process.env.NOTION_TODO_DB_ID || '33716212-4ddd-809c-9ca1-c6a649bca6e4'
+const TODO_DB_ID = process.env.NOTION_TODO_DB_ID || '337162124ddd80508602d598cd2896da'
 const CONTENT_DB_ID = '34116212-4ddd-80a4-8b44-fe0a634c2ef2'
 
 function getText(prop) {
@@ -107,52 +107,6 @@ router.patch('/tasks/:id', async (req, res) => {
     if (status) properties['Status'] = { status: { name: status } }
     const page = await notion.pages.update({ page_id: req.params.id, properties })
     res.json(mapTask(page))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-// GET /api/notion/tasks/:id/blocks — fetch block children for a task
-router.get('/tasks/:id/blocks', async (req, res) => {
-  try {
-    const notion = getClient()
-    async function fetchBlocks(blockId, depth = 0) {
-      if (depth > 2) return []
-      const result = await notion.blocks.children.list({ block_id: blockId, page_size: 100 })
-      return await Promise.all((result.results || []).map(async block => {
-        const type = block.type
-        const data = block[type] || {}
-        const item = {
-          id: block.id, type,
-          text: (data.rich_text || []).map(t => t.plain_text).join(''),
-          checked: data.checked || false,
-          hasChildren: block.has_children || false,
-          children: [],
-        }
-        if (block.has_children && depth < 2) {
-          item.children = await fetchBlocks(block.id, depth + 1)
-        }
-        return item
-      }))
-    }
-    const blocks = await fetchBlocks(req.params.id)
-    res.json(blocks)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-// PATCH /api/notion/blocks/:id — toggle a to_do block checked state
-router.patch('/blocks/:id', async (req, res) => {
-  try {
-    const notion = getClient()
-    const { checked, type } = req.body
-    const blockType = type || 'to_do'
-    const block = await notion.blocks.update({
-      block_id: req.params.id,
-      [blockType]: { checked: !!checked },
-    })
-    res.json({ ok: true, block })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

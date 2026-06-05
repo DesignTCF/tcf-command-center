@@ -34,7 +34,6 @@ const calendar        = read('calendar.json')
 const importItems     = read('import-items.json')
 const alibabaCo       = read('alibaba-convos.json')
 const notionPageTasks = read('notion-page-tasks.json')
-const notionTasks     = read('notion-tasks.json')      // live tasks from Notion API
 const links           = read('links.json')
 const driveHub        = read('drive-hub.json')
 
@@ -70,7 +69,8 @@ const staticData = {
   links,
   gcalEvents,
   driveHub,
-  tasks:        notionTasks,   // live Notion tasks — baked from notion-tasks.json
+  // placeholders — loaded live when server is up
+  tasks:        [],
   notionContent:[],
   gmailThreads: [],
   driveFiles:   [],
@@ -89,7 +89,6 @@ console.log(`  calendar:     ${calendar.length} events`)
 console.log(`  gcalEvents:   ${gcalEvents.length} events`)
 console.log(`  products:     ${products.length}`)
 console.log(`  projects:     ${projects.length}`)
-console.log(`  tasks:        ${notionTasks.length} live Notion tasks`)
-console.log(`  page tasks:   ${notionPageTasks.length} static`)
+console.log(`  tasks:        ${notionPageTasks.length}`)
 console.log(`  decisions:    ${decisions.length}`)
 console.log(`  suppliers:    ${suppliers.length}`)

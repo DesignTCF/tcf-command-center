@@ -102,28 +102,17 @@ export function AppProvider({ children }) {
     dispatch({ type: 'SYNCING', value: true })
 
     if (serverUpRef.current) {
-      // Server running: hit /api/sync (re-fetches Notion, GCal, Drive sources)
-      // then immediately reload all state so the dashboard shows fresh data
-      try { await api.post('/sync', {}) } catch {}
-      await loadAll()
-    } else {
-      // GitHub Pages: pull fresh Notion data directly from the API
-      // then reload state — no server needed for reads
+      // Server is running — hit /api/sync which re-fetches Notion, GCal, Drive sources,
+      // writes fresh JSON files, then reload all state
       try {
-        const [notionTasks, notionContent, gcalEvents] = await Promise.allSettled([
-          api.get('/notion/tasks'),
-          api.get('/notion/content'),
-          api.get('/gcal/events'),
-        ])
-        const payload = {}
-        if (notionTasks.status === 'fulfilled' && notionTasks.value?.length)
-          payload.tasks = notionTasks.value
-        if (notionContent.status === 'fulfilled' && notionContent.value?.length)
-          payload.notionContent = notionContent.value
-        if (gcalEvents.status === 'fulfilled' && gcalEvents.value?.length)
-          payload.gcalEvents = gcalEvents.value
-        if (Object.keys(payload).length) dispatch({ type: 'SET_MANY', payload })
-      } catch {}
+        await api.post('/sync', {})
+      } catch {}          // continue even if sync endpoint errors
+      await loadAll()     // reload always succeeds (falls back to static data)
+    } else {
+      // GitHub Pages (no server) — reload from baked-in static data.
+      // The site rebuilds 4x/day automatically with fresh data from all sources.
+      // Just re-apply staticData so any tab navigation picks up the latest build data.
+      dispatch({ type: 'SET_MANY', payload: staticData })
       dispatch({ type: 'SYNCED' })
     }
   }, [loadAll])
