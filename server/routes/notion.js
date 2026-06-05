@@ -112,6 +112,52 @@ router.patch('/tasks/:id', async (req, res) => {
   }
 })
 
+// GET /api/notion/tasks/:id/blocks — fetch block children for a task
+router.get('/tasks/:id/blocks', async (req, res) => {
+  try {
+    const notion = getClient()
+    async function fetchBlocks(blockId, depth = 0) {
+      if (depth > 2) return []
+      const result = await notion.blocks.children.list({ block_id: blockId, page_size: 100 })
+      return await Promise.all((result.results || []).map(async block => {
+        const type = block.type
+        const data = block[type] || {}
+        const item = {
+          id: block.id, type,
+          text: (data.rich_text || []).map(t => t.plain_text).join(''),
+          checked: data.checked || false,
+          hasChildren: block.has_children || false,
+          children: [],
+        }
+        if (block.has_children && depth < 2) {
+          item.children = await fetchBlocks(block.id, depth + 1)
+        }
+        return item
+      }))
+    }
+    const blocks = await fetchBlocks(req.params.id)
+    res.json(blocks)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// PATCH /api/notion/blocks/:id — toggle a to_do block checked state
+router.patch('/blocks/:id', async (req, res) => {
+  try {
+    const notion = getClient()
+    const { checked, type } = req.body
+    const blockType = type || 'to_do'
+    const block = await notion.blocks.update({
+      block_id: req.params.id,
+      [blockType]: { checked: !!checked },
+    })
+    res.json({ ok: true, block })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 // POST /api/notion/tasks
 router.post('/tasks', async (req, res) => {
   try {

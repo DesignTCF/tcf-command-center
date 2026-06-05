@@ -234,6 +234,151 @@ function isDone(task) {
   return task.done || DONE_STATUSES.has((task.status || '').toLowerCase())
 }
 
+// ─── To-do block row ─────────────────────────────────────────────────────────
+function TodoBlock({ block, taskId, onToggle, indent = 0 }) {
+  const [checking, setChecking] = useState(false)
+  const [localChecked, setLocalChecked] = useState(block.checked)
+
+  async function handleCheck() {
+    if (checking) return
+    setChecking(true)
+    const next = !localChecked
+    setLocalChecked(next)
+    try {
+      await api.patch(`/notion/blocks/${block.id}`, { checked: next, type: 'to_do' })
+      if (onToggle) onToggle(block.id, next)
+    } catch {
+      setLocalChecked(!next) // revert on error
+    }
+    setChecking(false)
+  }
+
+  return (
+    <>
+      <div
+        className={`flex items-start gap-2.5 py-2 px-4 border-b border-border last:border-0 group hover:bg-surface transition-colors ${localChecked ? 'opacity-40' : ''}`}
+        style={{ paddingLeft: 16 + indent * 20 }}
+      >
+        <button
+          onClick={handleCheck}
+          disabled={checking}
+          className={`mt-0.5 w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition-all ${
+            localChecked ? 'bg-teal border-teal' : 'border-border group-hover:border-teal'
+          }`}
+        >
+          {(localChecked || checking) && (
+            <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="white" strokeWidth="2">
+              <path d="M1.5 5l2.5 2.5 5-5"/>
+            </svg>
+          )}
+        </button>
+        <span className={`text-[12.5px] leading-snug flex-1 ${localChecked ? 'line-through text-ink-muted' : 'text-ink'}`}>
+          {block.text || '(empty)'}
+        </span>
+      </div>
+      {(block.children || []).map(child => (
+        <TodoBlock key={child.id} block={child} taskId={taskId} onToggle={onToggle} indent={indent + 1} />
+      ))}
+    </>
+  )
+}
+
+// ─── Notion task panel ────────────────────────────────────────────────────────
+function NotionTaskPanel({ task, onMarkDone }) {
+  const [expanded, setExpanded] = useState(true)
+  const [loadingBlocks, setLoadingBlocks] = useState(false)
+  const [blocks, setBlocks] = useState(task.blocks || [])
+
+  // Load blocks from API if not baked in (when server is running)
+  useEffect(() => {
+    if (blocks.length === 0 && !isDone(task)) {
+      setLoadingBlocks(true)
+      api.get(`/notion/tasks/${task.id}/blocks`)
+        .then(b => { if (b?.length) setBlocks(b) })
+        .catch(() => {})
+        .finally(() => setLoadingBlocks(false))
+    }
+  }, [task.id])
+
+  const todoBlocks   = blocks.filter(b => b.type === 'to_do')
+  const noteBlocks   = blocks.filter(b => b.type === 'paragraph' && b.text)
+  const openTodos    = todoBlocks.filter(b => !b.checked)
+  const checkedTodos = todoBlocks.filter(b => b.checked)
+
+  return (
+    <div className="panel overflow-hidden">
+      {/* Panel header */}
+      <div
+        className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-surface2 transition-colors border-b border-border"
+        onClick={() => setExpanded(v => !v)}
+      >
+        <div className="flex-1 min-w-0">
+          <div className="text-[13px] font-semibold text-ink leading-snug">{task.title}</div>
+          {noteBlocks[0] && (
+            <div className="text-[11px] text-ink-muted mt-0.5 truncate">{noteBlocks[0].text}</div>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {openTodos.length > 0 && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface2 text-ink-muted">
+              {openTodos.length} open
+            </span>
+          )}
+          <StatusBadge status={task.status} />
+          {task.url && (
+            <a href={task.url} target="_blank" rel="noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="text-[10px] text-ink-muted hover:text-teal">↗</a>
+          )}
+          <span className="text-ink-muted text-[11px]">{expanded ? '▲' : '▼'}</span>
+        </div>
+      </div>
+
+      {/* Body */}
+      {expanded && (
+        <div>
+          {loadingBlocks && (
+            <div className="px-4 py-3 text-[11px] text-ink-muted">Loading…</div>
+          )}
+
+          {!loadingBlocks && blocks.length === 0 && (
+            <div className="px-4 py-3 text-[11px] text-ink-muted italic">No items inside this task</div>
+          )}
+
+          {/* Notes / description paragraphs */}
+          {noteBlocks.slice(1).map(b => (
+            <div key={b.id} className="px-4 py-2 text-[11.5px] text-ink-muted border-b border-border bg-surface/50">
+              {b.text}
+            </div>
+          ))}
+
+          {/* Open to-do items */}
+          {openTodos.map(block => (
+            <TodoBlock key={block.id} block={block} taskId={task.id}
+              onToggle={(id, checked) => setBlocks(prev => prev.map(b => b.id === id ? { ...b, checked } : b))}
+            />
+          ))}
+
+          {/* Checked items (greyed) */}
+          {checkedTodos.map(block => (
+            <TodoBlock key={block.id} block={block} taskId={task.id}
+              onToggle={(id, checked) => setBlocks(prev => prev.map(b => b.id === id ? { ...b, checked } : b))}
+            />
+          ))}
+
+          {/* Non-todo other blocks */}
+          {blocks.filter(b => b.type !== 'to_do' && b.type !== 'paragraph').map(b => (
+            <div key={b.id} className="flex items-start gap-2 px-4 py-1.5 border-b border-border last:border-0">
+              <span className="text-ink-muted text-[10px] mt-0.5 shrink-0">{b.type}</span>
+              <span className="text-[12px] text-ink">{b.text}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Status display order — active statuses first
 const STATUS_ORDER = ['In progress', 'Not started', 'Backlog', 'Blocked', 'Waiting', 'Review']
 
@@ -306,116 +451,74 @@ function NotionTaskRow({ task, onMarkDone }) {
 // ─── Tasks Tab ───────────────────────────────────────────────────────────────
 
 function TasksTab() {
-  const { state, dispatch, reload } = useApp()
+  const { state, dispatch } = useApp()
   const [showDone, setShowDone] = useState(false)
-  const [addOpen, setAddOpen] = useState(false)
-  const [filter, setFilter] = useState('All')
+  const [addOpen, setAddOpen]   = useState(false)
 
-  // ALL tasks from Notion — no status filtering
-  const allTasks = state.tasks || []
+  const allTasks    = state.tasks || []
   const activeTasks = allTasks.filter(t => !isDone(t))
   const doneTasks   = allTasks.filter(t => isDone(t))
 
-  // Group active tasks by their actual Notion status
-  const grouped = {}
-  activeTasks.forEach(t => {
-    const s = t.status || 'No Status'
-    if (!grouped[s]) grouped[s] = []
-    grouped[s].push(t)
-  })
+  const totalTodos = activeTasks.reduce((n,t) =>
+    n + (t.blocks||[]).filter(b=>b.type==='to_do'&&!b.checked).length, 0)
 
-  // Sort groups: known order first, then alphabetical
-  const sortedStatuses = [
-    ...STATUS_ORDER.filter(s => grouped[s]),
-    ...Object.keys(grouped).filter(s => !STATUS_ORDER.includes(s)).sort(),
-  ]
-
-  // Category filter
-  const categories = ['All', ...new Set(activeTasks.map(t => categorizeTask(t)))]
-  const filtered = (tasks) => filter === 'All' ? tasks : tasks.filter(t => categorizeTask(t) === filter)
-
-  // Mark done — writes to Notion then removes from local state immediately
-  async function markDone(taskId) {
-    try {
-      await api.patch(`/notion/tasks/${taskId}`, { status: 'Done' })
-    } catch {}
+  async function markTaskDone(taskId) {
+    try { await api.patch(`/notion/tasks/${taskId}`, { status: 'Done' }) } catch {}
     dispatch({ type: 'UPDATE', key: 'tasks', id: taskId, value: { status: 'Done', done: true } })
   }
 
-  const totalOpen = activeTasks.length
-
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
 
-      {/* Header bar */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
-            <span className="text-[11px] text-ink-muted font-medium">Live from Notion · {totalOpen} open</span>
-          </div>
-          {/* Category filter */}
-          <div className="flex gap-1">
-            {categories.map(c => (
-              <button key={c} onClick={() => setFilter(c)}
-                className={`text-[10.5px] px-2.5 py-1 rounded-lg border transition-colors ${
-                  filter === c ? 'bg-teal text-white border-teal' : 'bg-white text-ink-muted border-border hover:border-teal/40'
-                }`}>
-                {c}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
+          <span className="text-[11px] text-ink-muted font-medium">
+            Live from Notion · {activeTasks.length} open{totalTodos > 0 ? ` · ${totalTodos} to-dos` : ''}
+          </span>
         </div>
         <button className="btn-primary text-xs px-3 py-1.5" onClick={() => setAddOpen(true)}>
           + Add to Notion
         </button>
       </div>
 
-      {/* Task groups — all statuses */}
-      {totalOpen === 0 ? (
+      {/* Open task panels — each is a Notion page with block content */}
+      {activeTasks.length === 0 && (
         <div className="panel p-8 text-center text-ink-muted text-sm">All caught up — no open tasks in Notion</div>
-      ) : (
-        <div className="panel divide-y divide-border overflow-hidden">
-          {sortedStatuses.map(status => {
-            const tasks = filtered(grouped[status])
-            if (!tasks.length) return null
-            const style = statusStyle(status)
-            return (
-              <div key={status}>
-                {/* Status group header */}
-                <div className={`flex items-center gap-2 px-4 py-2 ${style.bg}`}>
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${style.text}`}>{status}</span>
-                  <span className={`text-[10px] font-semibold ml-1 ${style.text} opacity-60`}>{tasks.length}</span>
-                </div>
-                {/* Tasks */}
-                {tasks.map(t => (
-                  <NotionTaskRow key={t.id} task={t} onMarkDone={markDone} />
-                ))}
-              </div>
-            )
-          })}
-        </div>
       )}
+
+      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
+        {activeTasks.map(task => (
+          <NotionTaskPanel key={task.id} task={task} onMarkDone={markTaskDone} />
+        ))}
+      </div>
 
       {/* Done — collapsible */}
       {doneTasks.length > 0 && (
-        <div className="panel overflow-hidden">
+        <div className="panel overflow-hidden mt-2">
           <div
-            className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-surface2 transition-colors"
+            className="flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-surface2 transition-colors"
             onClick={() => setShowDone(v => !v)}
           >
             <span className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Completed</span>
-            <span className="text-[10px] font-semibold text-ink-muted opacity-60">{doneTasks.length}</span>
+            <span className="text-[10px] text-ink-muted bg-surface2 px-1.5 py-0.5 rounded font-semibold">{doneTasks.length}</span>
             <span className="ml-auto text-[10px] text-ink-muted">{showDone ? '▲ Hide' : '▼ Show'}</span>
           </div>
-          {showDone && doneTasks.map(t => (
-            <div key={t.id} className="flex items-center gap-3 px-4 py-2 border-t border-border opacity-40">
-              <span className="text-teal text-[12px] shrink-0">✓</span>
-              <span className="text-[12px] text-ink line-through">{t.title}</span>
-              {t.url && <a href={t.url} target="_blank" rel="noreferrer" className="ml-auto text-[10px] text-ink-muted hover:text-teal">↗</a>}
+          {showDone && (
+            <div className="divide-y divide-border">
+              {doneTasks.map(t => (
+                <div key={t.id} className="flex items-center gap-3 px-4 py-2.5 opacity-40">
+                  <span className="text-teal text-[12px] shrink-0">✓</span>
+                  <span className="text-[12.5px] text-ink line-through flex-1">{t.title}</span>
+                  {t.url && (
+                    <a href={t.url} target="_blank" rel="noreferrer"
+                      className="text-[10px] text-ink-muted hover:text-teal">↗</a>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       )}
 
