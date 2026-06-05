@@ -2,11 +2,8 @@ name: Refresh Data & Deploy
 
 on:
   schedule:
-    # Runs at 6am, 10am, 2pm, 7pm EST (11, 15, 19, 00 UTC)
-    - cron: '0 11 * * *'
-    - cron: '0 15 * * *'
-    - cron: '0 19 * * *'
-    - cron: '0 0 * * *'
+    # Every hour — keeps Notion tasks, calendar, and Drive sources near-live
+    - cron: '0 * * * *'
   workflow_dispatch: # Allow manual trigger from GitHub Actions tab
 
 jobs:

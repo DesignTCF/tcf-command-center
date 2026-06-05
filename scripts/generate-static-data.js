@@ -34,6 +34,7 @@ const calendar        = read('calendar.json')
 const importItems     = read('import-items.json')
 const alibabaCo       = read('alibaba-convos.json')
 const notionPageTasks = read('notion-page-tasks.json')
+const notionTasks     = read('notion-tasks.json')      // live tasks from Notion API
 const links           = read('links.json')
 const driveHub        = read('drive-hub.json')
 
@@ -66,6 +67,7 @@ const staticData = {
   importItems,
   alibabaCo,
   notionPageTasks,
+  tasks: notionTasks,    // live Notion tasks baked in at build time
   links,
   gcalEvents,
   driveHub,

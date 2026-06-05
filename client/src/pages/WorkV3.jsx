@@ -228,78 +228,197 @@ function AddTaskModal({ onClose }) {
   )
 }
 
-// ─── Tasks Tab ───────────────────────────────────────────────────────────────
+// ─── Done status detection ────────────────────────────────────────────────────
+const DONE_STATUSES = new Set(['done', 'complete', 'completed', 'finished', 'closed'])
+function isDone(task) {
+  return task.done || DONE_STATUSES.has((task.status || '').toLowerCase())
+}
 
-function TasksTab() {
-  const { state } = useApp()
-  const [showDone, setShowDone] = useState(false)
-  const [addOpen, setAddOpen] = useState(false)
+// Status display order — active statuses first
+const STATUS_ORDER = ['In progress', 'Not started', 'Backlog', 'Blocked', 'Waiting', 'Review']
 
-  // Notion live tasks
-  const inProgress = (state.tasks || []).filter(t => t.status === 'In progress')
-  const notStarted = (state.tasks || []).filter(t => t.status === 'Not started')
-  const done = (state.tasks || []).filter(t => t.status === 'Done')
+// Status pill colors
+const STATUS_COLORS = {
+  'in progress':  { bg: 'bg-teal/10',    text: 'text-teal',        dot: 'bg-teal' },
+  'not started':  { bg: 'bg-surface2',   text: 'text-ink-muted',   dot: 'bg-surface3' },
+  'backlog':      { bg: 'bg-surface2',   text: 'text-ink-muted',   dot: 'bg-surface3' },
+  'blocked':      { bg: 'bg-red-50',     text: 'text-red-600',     dot: 'bg-red-500' },
+  'waiting':      { bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-400' },
+  'review':       { bg: 'bg-purple-50',  text: 'text-purple-700',  dot: 'bg-purple-400' },
+}
+function statusStyle(status) {
+  return STATUS_COLORS[(status || '').toLowerCase()] || { bg: 'bg-surface2', text: 'text-ink-muted', dot: 'bg-surface3' }
+}
 
-  // TCF project tasks from Notion page content — grouped by category
-  const pageTasks = state.notionPageTasks || []
-  const tcfProjects = {
-    'TCF House Brand': pageTasks.filter(t => ['t-tcf-1','t-tcf-2','t-tcf-3','t-tcf-4','t-tcf-5','t-tcf-6','t-tcf-7','t-tcf-8'].includes(t.id)),
-    'TCF Website': pageTasks.filter(t => t.id.startsWith('t-web-')),
-    'TCF Company Audit': pageTasks.filter(t => t.id.startsWith('t-audit-')),
-    'Skin Axis Packaging': pageTasks.filter(t => t.id.startsWith('t-skin-')),
-    'Salt Spa & Yoga': pageTasks.filter(t => t.id.startsWith('t-salt-')),
-    'Sip & Formulate': pageTasks.filter(t => t.id.startsWith('t-sip-')),
+// ─── Live Notion Task Row ─────────────────────────────────────────────────────
+function NotionTaskRow({ task, onMarkDone }) {
+  const [marking, setMarking] = useState(false)
+  const style = statusStyle(task.status)
+
+  async function handleDone(e) {
+    e.stopPropagation()
+    setMarking(true)
+    await onMarkDone(task.id)
+    setMarking(false)
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Notion Live Tasks */}
-      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <TaskColumn label="In Progress" tasks={inProgress} count={inProgress.length} />
-        <TaskColumn label="Not Started" tasks={notStarted} count={notStarted.length} />
+    <div className="flex items-start gap-3 py-2.5 px-4 border-b border-border last:border-0 group hover:bg-surface transition-colors">
+      {/* Checkbox */}
+      <button
+        onClick={handleDone}
+        disabled={marking}
+        title="Mark done in Notion"
+        className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 transition-all flex items-center justify-center ${
+          marking ? 'border-teal bg-teal/20' : 'border-border group-hover:border-teal'
+        }`}
+      >
+        {marking && <span className="text-[8px] text-teal">✓</span>}
+      </button>
+
+      {/* Title */}
+      <div className="flex-1 min-w-0">
+        <div className="text-[12.5px] text-ink leading-snug">{task.title || '(Untitled)'}</div>
+        {task.dueDate && (
+          <div className={`text-[10px] mt-0.5 ${isOverdue(task.dueDate) ? 'text-red font-semibold' : 'text-ink-muted'}`}>
+            Due {fmtDateShort(task.dueDate)}
+          </div>
+        )}
       </div>
 
-      {/* TCF Project Tasks from Notion page content */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="section-title">TCF Open Items by Project</div>
-          <span className="text-[10px] text-ink-muted">Pulled from Notion • {pageTasks.filter(t => t.status !== 'Done').length} open</span>
+      {/* Status pill */}
+      <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${style.bg} ${style.text}`}>
+        {task.status || '—'}
+      </span>
+
+      {/* Open in Notion */}
+      {task.url && (
+        <a href={task.url} target="_blank" rel="noreferrer"
+          className="text-[10px] text-ink-muted hover:text-teal opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+          title="Open in Notion">
+          ↗
+        </a>
+      )}
+    </div>
+  )
+}
+
+// ─── Tasks Tab ───────────────────────────────────────────────────────────────
+
+function TasksTab() {
+  const { state, dispatch, reload } = useApp()
+  const [showDone, setShowDone] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [filter, setFilter] = useState('All')
+
+  // ALL tasks from Notion — no status filtering
+  const allTasks = state.tasks || []
+  const activeTasks = allTasks.filter(t => !isDone(t))
+  const doneTasks   = allTasks.filter(t => isDone(t))
+
+  // Group active tasks by their actual Notion status
+  const grouped = {}
+  activeTasks.forEach(t => {
+    const s = t.status || 'No Status'
+    if (!grouped[s]) grouped[s] = []
+    grouped[s].push(t)
+  })
+
+  // Sort groups: known order first, then alphabetical
+  const sortedStatuses = [
+    ...STATUS_ORDER.filter(s => grouped[s]),
+    ...Object.keys(grouped).filter(s => !STATUS_ORDER.includes(s)).sort(),
+  ]
+
+  // Category filter
+  const categories = ['All', ...new Set(activeTasks.map(t => categorizeTask(t)))]
+  const filtered = (tasks) => filter === 'All' ? tasks : tasks.filter(t => categorizeTask(t) === filter)
+
+  // Mark done — writes to Notion then removes from local state immediately
+  async function markDone(taskId) {
+    try {
+      await api.patch(`/notion/tasks/${taskId}`, { status: 'Done' })
+    } catch {}
+    dispatch({ type: 'UPDATE', key: 'tasks', id: taskId, value: { status: 'Done', done: true } })
+  }
+
+  const totalOpen = activeTasks.length
+
+  return (
+    <div className="flex flex-col gap-5">
+
+      {/* Header bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
+            <span className="text-[11px] text-ink-muted font-medium">Live from Notion · {totalOpen} open</span>
+          </div>
+          {/* Category filter */}
+          <div className="flex gap-1">
+            {categories.map(c => (
+              <button key={c} onClick={() => setFilter(c)}
+                className={`text-[10.5px] px-2.5 py-1 rounded-lg border transition-colors ${
+                  filter === c ? 'bg-teal text-white border-teal' : 'bg-white text-ink-muted border-border hover:border-teal/40'
+                }`}>
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-          {Object.entries(tcfProjects).map(([projectName, tasks]) => {
-            const open = tasks.filter(t => t.status !== 'Done' && t.status !== 'Complete')
-            if (open.length === 0) return null
+        <button className="btn-primary text-xs px-3 py-1.5" onClick={() => setAddOpen(true)}>
+          + Add to Notion
+        </button>
+      </div>
+
+      {/* Task groups — all statuses */}
+      {totalOpen === 0 ? (
+        <div className="panel p-8 text-center text-ink-muted text-sm">All caught up — no open tasks in Notion</div>
+      ) : (
+        <div className="panel divide-y divide-border overflow-hidden">
+          {sortedStatuses.map(status => {
+            const tasks = filtered(grouped[status])
+            if (!tasks.length) return null
+            const style = statusStyle(status)
             return (
-              <div key={projectName} className="panel">
-                <div className="panel-header">
-                  <div className="text-sm font-semibold text-ink">{projectName}</div>
-                  <span className="text-[10px] bg-surface2 text-ink-muted px-1.5 py-0.5 rounded font-semibold">{open.length} open</span>
+              <div key={status}>
+                {/* Status group header */}
+                <div className={`flex items-center gap-2 px-4 py-2 ${style.bg}`}>
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${style.text}`}>{status}</span>
+                  <span className={`text-[10px] font-semibold ml-1 ${style.text} opacity-60`}>{tasks.length}</span>
                 </div>
-                <div className="divide-y divide-border">
-                  {open.map(t => (
-                    <div key={t.id} className="px-4 py-2.5 flex items-start gap-2.5">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${t.priority === 'High' ? 'bg-amber' : t.priority === 'Medium' ? 'bg-teal' : 'bg-surface3'}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-ink leading-snug">{t.title}</div>
-                        {t.notes && <div className="text-[11px] text-ink-muted mt-0.5 truncate">{t.notes}</div>}
-                      </div>
-                      <span className="text-[9.5px] text-ink-muted shrink-0">{t.category}</span>
-                    </div>
-                  ))}
-                </div>
+                {/* Tasks */}
+                {tasks.map(t => (
+                  <NotionTaskRow key={t.id} task={t} onMarkDone={markDone} />
+                ))}
               </div>
             )
           })}
         </div>
-      </div>
+      )}
 
-      <div className="panel p-4" style={{ borderColor: '#D8D8D8' }}>
-        <TaskColumn label="Completed" tasks={done} count={done.length} dim collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
-      </div>
+      {/* Done — collapsible */}
+      {doneTasks.length > 0 && (
+        <div className="panel overflow-hidden">
+          <div
+            className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-surface2 transition-colors"
+            onClick={() => setShowDone(v => !v)}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Completed</span>
+            <span className="text-[10px] font-semibold text-ink-muted opacity-60">{doneTasks.length}</span>
+            <span className="ml-auto text-[10px] text-ink-muted">{showDone ? '▲ Hide' : '▼ Show'}</span>
+          </div>
+          {showDone && doneTasks.map(t => (
+            <div key={t.id} className="flex items-center gap-3 px-4 py-2 border-t border-border opacity-40">
+              <span className="text-teal text-[12px] shrink-0">✓</span>
+              <span className="text-[12px] text-ink line-through">{t.title}</span>
+              {t.url && <a href={t.url} target="_blank" rel="noreferrer" className="ml-auto text-[10px] text-ink-muted hover:text-teal">↗</a>}
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div>
-        <button className="btn-primary text-xs px-3 py-2" onClick={() => setAddOpen(true)}>+ Add to Notion</button>
-      </div>
       {addOpen && <AddTaskModal onClose={() => setAddOpen(false)} />}
     </div>
   )
