@@ -5,15 +5,26 @@
   "portsAttributes": {
     "3001": {
       "label": "TCF Dashboard",
-      "onAutoForward": "openBrowser",
+      "onAutoForward": "notify",
       "visibility": "public"
     }
   },
-  "postCreateCommand": "cd server && npm install && cd ../client && npm install && npm run build",
-  "postStartCommand": "cd server && node index.js &",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start.sh",
   "customizations": {
     "vscode": {
-      "extensions": ["esbenp.prettier-vscode"]
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-json"
+      ]
     }
+  },
+  "secrets": {
+    "NOTION_TOKEN": { "description": "Notion integration token" },
+    "GMAIL_CLIENT_ID": { "description": "Google OAuth Client ID" },
+    "GMAIL_CLIENT_SECRET": { "description": "Google OAuth Client Secret" },
+    "ANTHROPIC_API_KEY": { "description": "Anthropic API key for AI chat" },
+    "GITHUB_TOKEN": { "description": "GitHub personal access token" }
   }
 }

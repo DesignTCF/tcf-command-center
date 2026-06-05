@@ -10,10 +10,12 @@ services:
         value: production
       - key: PORT
         value: 3001
+      # ── Notion ────────────────────────────────────────────────
       - key: NOTION_TOKEN
         sync: false
       - key: NOTION_TODO_DB_ID
         value: 337162124ddd80508602d598cd2896da
+      # ── Gmail OAuth ───────────────────────────────────────────
       - key: GMAIL_CLIENT_ID
         sync: false
       - key: GMAIL_CLIENT_SECRET
@@ -22,13 +24,22 @@ services:
         value: design@thecosmeticformulary.com,design@paulyinc.com,tcfdesign.katherinefox@gmail.com
       - key: GMAIL_REDIRECT_URI
         sync: false
+      # ── Google Drive OAuth ────────────────────────────────────
       - key: DRIVE_REDIRECT_URI
         sync: false
+      # ── Google Docs ───────────────────────────────────────────
       - key: GDOC_ID
         value: 1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM
+      # ── AI ────────────────────────────────────────────────────
       - key: ANTHROPIC_API_KEY
         sync: false
+      # ── GitHub ────────────────────────────────────────────────
       - key: GITHUB_USER
         value: DesignTCF
       - key: GITHUB_TOKEN
+        sync: false
+      # ── Shopify ───────────────────────────────────────────────
+      - key: SHOPIFY_STORE_URL
+        sync: false
+      - key: SHOPIFY_ADMIN_TOKEN
         sync: false

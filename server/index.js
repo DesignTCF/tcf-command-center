@@ -33,6 +33,7 @@ app.use('/api/gcal', require('./routes/gcal'))
 app.use('/alibaba-sync-setup', require('./routes/alibaba-bookmarklet'))
 
 app.use('/api/sync', require('./routes/sync'))
+app.use('/api/shopify', require('./routes/shopify'))
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }))
 
 // Serve built React app
