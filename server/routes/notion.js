@@ -6,7 +6,7 @@ function getClient() {
   return new Client({ auth: process.env.NOTION_TOKEN })
 }
 
-const TODO_DB_ID = process.env.NOTION_TODO_DB_ID || '337162124ddd80508602d598cd2896da'
+const TODO_DB_ID = process.env.NOTION_TODO_DB_ID || '33716212-4ddd-809c-9ca1-c6a649bca6e4'
 const CONTENT_DB_ID = '34116212-4ddd-80a4-8b44-fe0a634c2ef2'
 
 function getText(prop) {
