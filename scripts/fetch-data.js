@@ -27,52 +27,52 @@ function httpGet(url, headers = {}) {
   })
 }
 
-async function notionPost(endpoint, body) {
+// ── Notion (uses SDK from server/node_modules — proven to work) ───────────────
+function getNotionClient() {
   const token = process.env.NOTION_TOKEN
-  if (!token) return null
-  return new Promise((resolve, reject) => {
-    const data = JSON.stringify(body)
-    const req = https.request({
-      hostname: 'api.notion.com',
-      path: endpoint,
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28',
-        'Content-Length': Buffer.byteLength(data),
-      },
-    }, res => {
-      let body = ''
-      res.on('data', d => body += d)
-      res.on('end', () => resolve(JSON.parse(body)))
+  if (!token) throw new Error('NOTION_TOKEN not set')
+  // Load SDK from server's node_modules
+  const { Client } = require(require('path').join(__dirname, '../server/node_modules/@notionhq/client'))
+  return new Client({ auth: token })
+}
+
+function getText(prop) {
+  if (!prop) return ''
+  if (prop.title) return prop.title.map(t => t.plain_text).join('')
+  if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('')
+  return ''
+}
+
+async function fetchAllNotionPages(notion, database_id, sorts = []) {
+  const pages = []
+  let cursor = undefined
+  do {
+    const res = await notion.databases.query({
+      database_id,
+      sorts,
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
     })
-    req.on('error', reject)
-    req.write(data)
-    req.end()
-  })
+    pages.push(...res.results)
+    cursor = res.has_more ? res.next_cursor : undefined
+  } while (cursor)
+  return pages
 }
 
 // ── Notion Tasks ──────────────────────────────────────────────────────────────
 async function fetchNotionTasks() {
   try {
+    const notion = getNotionClient()
     const dbId = process.env.NOTION_TODO_DB_ID || '337162124ddd80508602d598cd2896da'
-    const result = await notionPost(`/v1/databases/${dbId}/query`, {
-      sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
-      page_size: 100,
-    })
-    if (!result?.results) return
 
-    function getText(prop) {
-      if (!prop) return ''
-      if (prop.title) return prop.title.map(t => t.plain_text).join('')
-      if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('')
-      return ''
-    }
+    const pages = await fetchAllNotionPages(notion, dbId, [
+      { timestamp: 'last_edited_time', direction: 'descending' }
+    ])
 
-    const tasks = result.results.map(page => {
+    const tasks = pages.map(page => {
       const props = page.properties || {}
-      const titleProp = props['Task name'] || props['Name'] || props['Title'] || Object.values(props).find(p => p.type === 'title')
+      const titleProp = props['Task name'] || props['Name'] || props['Title'] ||
+        Object.values(props).find(p => p.type === 'title')
       const statusVal = props['Status']
       const statusName = statusVal?.status?.name || statusVal?.select?.name || ''
       return {
@@ -80,40 +80,39 @@ async function fetchNotionTasks() {
         title: getText(titleProp),
         status: statusName,
         dueDate: props['Due date']?.date?.start || props['Due Date']?.date?.start || null,
+        assignee: (props['Assignee']?.people || []).map(p => p.name).join(', '),
         url: page.url,
         lastEdited: page.last_edited_time,
-        done: statusName === 'Done',
+        done: ['done', 'complete', 'completed'].includes(statusName.toLowerCase()),
         source: 'notion',
       }
     })
 
     write('notion-tasks.json', tasks)
-    log(`✓ Notion tasks: ${tasks.length}`)
+    log(`✓ Notion tasks: ${tasks.length} (${tasks.filter(t => !t.done).length} open)`)
   } catch (err) {
-    log(`✗ Notion tasks: ${err.message}`)
+    log(`✗ Notion tasks FAILED: ${err.message}`)
+    // Write empty array so generate-static-data doesn't use stale data
+    if (!require('fs').existsSync(require('path').join(require('path').join(__dirname, '../data'), 'notion-tasks.json'))) {
+      write('notion-tasks.json', [])
+    }
   }
 }
 
 // ── Notion Content Calendar ───────────────────────────────────────────────────
 async function fetchNotionContent() {
   try {
+    const notion = getNotionClient()
     const CONTENT_DB_ID = '34116212-4ddd-80a4-8b44-fe0a634c2ef2'
-    const result = await notionPost(`/v1/databases/${CONTENT_DB_ID}/query`, {
-      sorts: [{ property: 'Publish date', direction: 'descending' }],
-      page_size: 50,
-    })
-    if (!result?.results) return
 
-    function getText(prop) {
-      if (!prop) return ''
-      if (prop.title) return prop.title.map(t => t.plain_text).join('')
-      if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('')
-      return ''
-    }
+    const pages = await fetchAllNotionPages(notion, CONTENT_DB_ID, [
+      { property: 'Publish date', direction: 'descending' }
+    ])
 
-    const content = result.results.map(page => {
+    const content = pages.map(page => {
       const props = page.properties || {}
-      const titleProp = props['Content name'] || props['Name'] || Object.values(props).find(p => p.type === 'title')
+      const titleProp = props['Content name'] || props['Name'] ||
+        Object.values(props).find(p => p.type === 'title')
       return {
         id: page.id,
         title: getText(titleProp),
@@ -128,7 +127,7 @@ async function fetchNotionContent() {
     write('notion-content.json', content)
     log(`✓ Notion content: ${content.length}`)
   } catch (err) {
-    log(`✗ Notion content: ${err.message}`)
+    log(`✗ Notion content FAILED: ${err.message}`)
   }
 }
 

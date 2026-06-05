@@ -67,12 +67,10 @@ const staticData = {
   importItems,
   alibabaCo,
   notionPageTasks,
-  tasks: notionTasks,    // live Notion tasks baked in at build time
   links,
   gcalEvents,
   driveHub,
-  // placeholders — loaded live when server is up
-  tasks:        [],
+  tasks:        notionTasks,   // live Notion tasks — baked from notion-tasks.json
   notionContent:[],
   gmailThreads: [],
   driveFiles:   [],
@@ -91,6 +89,7 @@ console.log(`  calendar:     ${calendar.length} events`)
 console.log(`  gcalEvents:   ${gcalEvents.length} events`)
 console.log(`  products:     ${products.length}`)
 console.log(`  projects:     ${projects.length}`)
-console.log(`  tasks:        ${notionPageTasks.length}`)
+console.log(`  tasks:        ${notionTasks.length} live Notion tasks`)
+console.log(`  page tasks:   ${notionPageTasks.length} static`)
 console.log(`  decisions:    ${decisions.length}`)
 console.log(`  suppliers:    ${suppliers.length}`)
