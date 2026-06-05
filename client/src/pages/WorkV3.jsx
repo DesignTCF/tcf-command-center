@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useApp } from '../store/AppContext'
 import api from '../lib/api'
 import { fmtDate, fmtDateShort, isOverdue } from '../lib/utils'
@@ -351,74 +351,6 @@ function NotionTaskPanel({ task }) {
   )
 }
 
-// Status display order — active statuses first
-const STATUS_ORDER = ['In progress', 'Not started', 'Backlog', 'Blocked', 'Waiting', 'Review']
-
-// Status pill colors
-const STATUS_COLORS = {
-  'in progress':  { bg: 'bg-teal/10',    text: 'text-teal',        dot: 'bg-teal' },
-  'not started':  { bg: 'bg-surface2',   text: 'text-ink-muted',   dot: 'bg-surface3' },
-  'backlog':      { bg: 'bg-surface2',   text: 'text-ink-muted',   dot: 'bg-surface3' },
-  'blocked':      { bg: 'bg-red-50',     text: 'text-red-600',     dot: 'bg-red-500' },
-  'waiting':      { bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-400' },
-  'review':       { bg: 'bg-purple-50',  text: 'text-purple-700',  dot: 'bg-purple-400' },
-}
-function statusStyle(status) {
-  return STATUS_COLORS[(status || '').toLowerCase()] || { bg: 'bg-surface2', text: 'text-ink-muted', dot: 'bg-surface3' }
-}
-
-// ─── Live Notion Task Row ─────────────────────────────────────────────────────
-function NotionTaskRow({ task, onMarkDone }) {
-  const [marking, setMarking] = useState(false)
-  const style = statusStyle(task.status)
-
-  async function handleDone(e) {
-    e.stopPropagation()
-    setMarking(true)
-    await onMarkDone(task.id)
-    setMarking(false)
-  }
-
-  return (
-    <div className="flex items-start gap-3 py-2.5 px-4 border-b border-border last:border-0 group hover:bg-surface transition-colors">
-      {/* Checkbox */}
-      <button
-        onClick={handleDone}
-        disabled={marking}
-        title="Mark done in Notion"
-        className={`mt-0.5 w-4 h-4 rounded-full border-2 shrink-0 transition-all flex items-center justify-center ${
-          marking ? 'border-teal bg-teal/20' : 'border-border group-hover:border-teal'
-        }`}
-      >
-        {marking && <span className="text-[8px] text-teal">✓</span>}
-      </button>
-
-      {/* Title */}
-      <div className="flex-1 min-w-0">
-        <div className="text-[12.5px] text-ink leading-snug">{task.title || '(Untitled)'}</div>
-        {task.dueDate && (
-          <div className={`text-[10px] mt-0.5 ${isOverdue(task.dueDate) ? 'text-red font-semibold' : 'text-ink-muted'}`}>
-            Due {fmtDateShort(task.dueDate)}
-          </div>
-        )}
-      </div>
-
-      {/* Status pill */}
-      <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${style.bg} ${style.text}`}>
-        {task.status || '—'}
-      </span>
-
-      {/* Open in Notion */}
-      {task.url && (
-        <a href={task.url} target="_blank" rel="noreferrer"
-          className="text-[10px] text-ink-muted hover:text-teal opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
-          title="Open in Notion">
-          ↗
-        </a>
-      )}
-    </div>
-  )
-}
 
 // ─── Tasks Tab ───────────────────────────────────────────────────────────────
 
