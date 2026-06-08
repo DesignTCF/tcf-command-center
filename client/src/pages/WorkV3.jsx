@@ -23,17 +23,108 @@ const PIPELINE_STAGES = ['Formula', 'Packaging', 'Artwork', 'Launch']
 
 // ─── Task categorization ────────────────────────────────────────────────────
 
+const CATEGORIES = [
+  {
+    key: 'Formulas & R&D',
+    color: '#157A50',
+    icon: '⚗',
+    test: (t, src) =>
+      /formula|inci|ingredient|batch|stability|formul|which formula|r&d|formulating|chemist|active|concentration|ph |preservative|emulsifier|surfactant|raw material/.test(t),
+  },
+  {
+    key: 'Packaging & Labels',
+    color: '#A86200',
+    icon: '📦',
+    test: (t, src) =>
+      /packaging|bottle|jar|tube|closure|pump|cap|dieline|label|artwork|print|silkscreen|finish|carton|box|container|airless|matte|gloss|frosted|pantone|upc|barcode|mockup|render|seal|fill weight|bottle direction|label system|packaging material|packaging direction/.test(t),
+  },
+  {
+    key: 'Website & Digital',
+    color: '#2255AA',
+    icon: '🌐',
+    test: (t, src) =>
+      /website|web |homepage|e-commerce|shopify|catalog|store|navigation|menu|landing|digital direction|site direction|page structure|mockup.*site|site.*mockup|catalog.*architecture|collection page|product page|booking.*flow|digital/.test(t),
+  },
+  {
+    key: 'Brand Identity & Design',
+    color: '#5533AA',
+    icon: '✦',
+    test: (t, src) =>
+      /brand identity|visual system|typography|color palette|logo|color strategy|design direction|visual direction|brand tone|brand story|reference.*visual|visual.*reference|mockup|concept mock|identity|brand direction|design system|creative/.test(t),
+  },
+  {
+    key: 'Salt Spa — Legal & Finance',
+    color: '#B52B2B',
+    icon: '⚖',
+    test: (t, src) =>
+      src.includes('salt spa') && /agreement|legal|contract|lease|attorney|tax|ein|llc|operating agreement|waiver|consent|signage|financial model|cash flow|bank account|quickbooks|revenue|budget|distribution gate|financial review|financing|capital/.test(t),
+  },
+  {
+    key: 'Salt Spa — Build-out & Equipment',
+    color: '#C17F24',
+    icon: '🏗',
+    test: (t, src) =>
+      src.includes('salt spa') && /floor plan|build|install|furniture|equipment|hydrafacial|led|microcurrent|shelf|display|window|signage|partition|classroom|office|acoust|room|event space|mixing bar|refill bar|beauty bar|apothecary wall|front window/.test(t),
+  },
+  {
+    key: 'Salt Spa — Retail, Products & Hiring',
+    color: '#157A50',
+    icon: '🛍',
+    test: (t, src) =>
+      src.includes('salt spa') && /retail|wholesale|inventory|hire|staff|position|train|commission|sku|apothecary|formulate|brand.*wall|pos|booking system|faire|catalog|trade show|product|import|vendor|exclusiv|merchandis|commission|return policy|checklist|cash handling/.test(t),
+  },
+  {
+    key: 'Client Brand Work',
+    color: '#0D9E9E',
+    icon: '◈',
+    test: (t, src) =>
+      /nevoo|daily rou|nitt beauty|devoted man|skin axis|sip.formulate|salt spa|client profile|molly smith|gamze|meredith|josh smith|andrew moss/.test(t),
+  },
+  {
+    key: 'TCF — Operations & Compliance',
+    color: '#444444',
+    icon: '◎',
+    test: () => true, // catch-all
+  },
+]
+
 function categorizeTask(task) {
   const t = (task.title || '').toLowerCase()
-  if (/packaging|bottle|label|print/.test(t)) return 'Packaging'
-  if (/nevoo|daily rou|nitt|salt spa|devoted/.test(t)) return 'Brand / Client'
-  return 'TCF / Business'
+  const src = (task.sourceName || '').toLowerCase()
+  for (const cat of CATEGORIES) {
+    if (cat.test(t, src)) return cat.key
+  }
+  return 'TCF — Operations & Compliance'
 }
 
-const CATEGORY_COLORS = {
-  'Packaging': '#A86200',
-  'Brand / Client': '#0D9E9E',
-  'TCF / Business': '#5533AA',
+const CATEGORY_COLORS = Object.fromEntries(CATEGORIES.map(c => [c.key, c.color]))
+const CATEGORY_ICONS  = Object.fromEntries(CATEGORIES.map(c => [c.key, c.icon]))
+
+// ─── Urgency scoring ─────────────────────────────────────────────────────────
+function urgencyScore(task) {
+  let score = 0
+  const t = (task.title || '').toLowerCase()
+  const now = new Date()
+
+  // Due date urgency
+  if (task.dueDate) {
+    const due = new Date(task.dueDate)
+    const daysUntil = (due - now) / (1000 * 60 * 60 * 24)
+    if (daysUntil < 0)       score += 100  // overdue
+    else if (daysUntil < 3)  score += 80
+    else if (daysUntil < 7)  score += 60
+    else if (daysUntil < 14) score += 40
+    else if (daysUntil < 30) score += 20
+  }
+
+  // Status boost
+  if (task.status === 'In progress' || task.status === 'In Progress') score += 50
+
+  // Keyword urgency
+  if (/confirm|sign|approve|urgent|asap|rush|deadline|overdue|today|this week|by friday|by monday/.test(t)) score += 30
+  if (/draft|finalize|complete|finish|submit|send|review/.test(t)) score += 10
+
+  return score
 }
 
 function groupByCategory(tasks) {
@@ -233,8 +324,6 @@ const DRIVE_SOURCE_DOCS = [
   { name: 'Action Items – Class & Retail', url: 'https://docs.google.com/document/d/1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw/edit' },
 ]
 
-const CATEGORY_ORDER = ['TCF / Business', 'Brand / Client', 'Packaging']
-
 function TasksTab() {
   const { state } = useApp()
   const [filter, setFilter] = useState('all')
@@ -251,13 +340,27 @@ function TasksTab() {
 
   const done = (state.tasks || []).filter(t => t.done || t.status === 'Done' || t.status === 'Complete' || t.status === 'Completed')
 
-  // Group by category
-  const byCategory = {}
-  filtered.forEach(t => {
-    const cat = categorizeTask(t)
-    if (!byCategory[cat]) byCategory[cat] = []
-    byCategory[cat].push(t)
-  })
+  // Group by category, sort tasks within each by urgency (highest first)
+  const rawGroups = groupByCategory(filtered)
+  const sortedGroups = Object.fromEntries(
+    Object.entries(rawGroups).map(([cat, tasks]) => [
+      cat,
+      [...tasks].sort((a, b) => urgencyScore(b) - urgencyScore(a)),
+    ])
+  )
+
+  // Order categories: categories with any overdue/in-progress tasks first,
+  // then follow CATEGORIES definition order (already priority-ordered)
+  const catMaxScore = cat => Math.max(0, ...(sortedGroups[cat] || []).map(urgencyScore))
+  const orderedCats = CATEGORIES.map(c => c.key)
+    .filter(k => sortedGroups[k]?.length > 0)
+    .sort((a, b) => {
+      // If one has overdue tasks, it wins
+      const aScore = catMaxScore(a)
+      const bScore = catMaxScore(b)
+      if (aScore !== bScore) return bScore - aScore
+      return 0 // preserve definition order when tied
+    })
 
   // Task counts per source doc (for chips)
   const sourceCounts = {}
@@ -304,54 +407,67 @@ function TasksTab() {
         <span className="text-[11px] text-ink-muted">{filtered.length} task{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
-      {/* Category Sections */}
+      {/* Category Sections — ordered by urgency */}
       {filtered.length === 0 ? (
         <EmptyState message="No tasks match this filter." />
       ) : (
-        CATEGORY_ORDER.map(cat => {
-          const tasks = byCategory[cat] || []
+        orderedCats.map(cat => {
+          const tasks = sortedGroups[cat] || []
           if (tasks.length === 0) return null
+          const color = CATEGORY_COLORS[cat] || '#58595b'
+          const icon  = CATEGORY_ICONS[cat]  || '•'
+          const topScore = catMaxScore(cat)
+          const isUrgent = topScore >= 80
           return (
             <div key={cat} className="panel overflow-hidden">
               <div className="panel-header" style={{
-                background: CATEGORY_COLORS[cat] + '12',
-                borderBottom: '1px solid ' + CATEGORY_COLORS[cat] + '30',
+                background: color + '10',
+                borderBottom: '1px solid ' + color + '25',
               }}>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: CATEGORY_COLORS[cat] }}>{cat}</span>
+                  <span className="text-[13px]">{icon}</span>
+                  <span className="text-[11.5px] font-bold" style={{ color }}>{cat}</span>
+                  {isUrgent && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ background: '#FEE2E2', color: '#B91C1C' }}>URGENT</span>
+                  )}
                 </div>
                 <span className="text-[10.5px] text-ink-muted">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</span>
               </div>
               <div className="divide-y divide-border">
-                {tasks.map(t => (
-                  <div key={t.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-surface2 group transition-colors">
-                    <div className="w-2 h-2 rounded-full mt-[5px] shrink-0 border"
-                      style={{
-                        background: t.status === 'In progress' || t.status === 'In Progress' ? '#0D9E9E' : 'white',
-                        borderColor: t.status === 'In progress' || t.status === 'In Progress' ? '#0D9E9E' : '#BBBBBB',
-                      }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[12.5px] text-ink leading-snug">{t.title}</div>
-                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                        <span className="text-[10px] text-ink-muted">{t.sourceName}</span>
-                        {t.status === 'In progress' || t.status === 'In Progress' ? (
-                          <span className="text-[9px] font-semibold text-teal bg-teal/10 px-1.5 py-0.5 rounded-full">In Progress</span>
-                        ) : null}
-                        {t.dueDate && (
-                          <span className="text-[10px]" style={{ color: isOverdue(t.dueDate) ? '#B52B2B' : '#888' }}>
-                            · Due {t.dueDate}
-                          </span>
-                        )}
+                {tasks.map((t, idx) => {
+                  const score = urgencyScore(t)
+                  const overdue = t.dueDate && isOverdue(t.dueDate)
+                  const inProg  = t.status === 'In progress' || t.status === 'In Progress'
+                  return (
+                    <div key={t.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-surface2 group transition-colors">
+                      {/* Priority indicator */}
+                      <div className="flex flex-col items-center gap-0.5 shrink-0 mt-[3px]">
+                        <div className="w-2 h-2 rounded-full border"
+                          style={{
+                            background: overdue ? '#B52B2B' : inProg ? color : 'white',
+                            borderColor: overdue ? '#B52B2B' : inProg ? color : '#BBBBBB',
+                          }} />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[12.5px] text-ink leading-snug">{t.title}</div>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          <span className="text-[10px] text-ink-muted">{t.sourceName}</span>
+                          {inProg && <span className="text-[9px] font-semibold text-teal bg-teal/10 px-1.5 py-0.5 rounded-full">In Progress</span>}
+                          {overdue && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: '#FEE2E2', color: '#B91C1C' }}>Overdue</span>}
+                          {t.dueDate && !overdue && (
+                            <span className="text-[10px]" style={{ color: '#888' }}>· Due {t.dueDate}</span>
+                          )}
+                        </div>
+                      </div>
+                      {t.url && (
+                        <a href={t.url} target="_blank" rel="noopener noreferrer"
+                          className="opacity-0 group-hover:opacity-100 text-[11px] text-teal hover:underline shrink-0 mt-0.5 font-medium transition-opacity"
+                          title={`Open in Drive — ${t.sourceName || ''}`}>↗</a>
+                      )}
                     </div>
-                    {t.url && (
-                      <a href={t.url} target="_blank" rel="noopener noreferrer"
-                        className="opacity-0 group-hover:opacity-100 text-[11px] text-teal hover:underline shrink-0 mt-0.5 font-medium transition-opacity"
-                        title={`Open in Drive — ${t.sourceName || ''}`}>↗</a>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )
