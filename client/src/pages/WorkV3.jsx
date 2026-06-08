@@ -226,88 +226,139 @@ function AddTaskModal({ onClose }) {
 
 // ─── Tasks Tab ───────────────────────────────────────────────────────────────
 
+const DRIVE_SOURCE_DOCS = [
+  { name: 'TCF to-do List',               url: 'https://docs.google.com/document/d/1ofvcpceHYsEt7I-dwZXA78YycDH0WsdhlbUVlI0lYJA/edit' },
+  { name: "Katherine's Notes",             url: 'https://docs.google.com/document/d/1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM/edit' },
+  { name: 'Salt Spa Action Items',         url: 'https://docs.google.com/spreadsheets/d/1iPMeoBklpr90wV553ZGnYCsKqsmk4Jb9ww6kK-TXGjI/edit' },
+  { name: 'Action Items – Class & Retail', url: 'https://docs.google.com/document/d/1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw/edit' },
+]
+
+const CATEGORY_ORDER = ['TCF / Business', 'Brand / Client', 'Packaging']
+
 function TasksTab() {
   const { state } = useApp()
+  const [filter, setFilter] = useState('all')
   const [showDone, setShowDone] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
 
-  // Drive tasks — sourced from Google Drive docs/sheets
-  const inProgress = (state.tasks || []).filter(t => t.status === 'In progress')
-  const notStarted = (state.tasks || []).filter(t => t.status === 'Not started')
-  const done = (state.tasks || []).filter(t => t.status === 'Done')
-  const pageTasks = []  // no longer used (was Notion page tasks)
-  const tcfProjects = {
-    'TCF House Brand': pageTasks.filter(t => ['t-tcf-1','t-tcf-2','t-tcf-3','t-tcf-4','t-tcf-5','t-tcf-6','t-tcf-7','t-tcf-8'].includes(t.id)),
-    'TCF Website': pageTasks.filter(t => t.id.startsWith('t-web-')),
-    'TCF Company Audit': pageTasks.filter(t => t.id.startsWith('t-audit-')),
-    'Skin Axis Packaging': pageTasks.filter(t => t.id.startsWith('t-skin-')),
-    'Salt Spa & Yoga': pageTasks.filter(t => t.id.startsWith('t-salt-')),
-    'Sip & Formulate': pageTasks.filter(t => t.id.startsWith('t-sip-')),
-  }
+  const allActive = (state.tasks || []).filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete' && t.status !== 'Completed')
 
-  // Group tasks by source document
-  const tasksBySource = {}
-  ;(state.tasks || []).filter(t => !t.done && t.status !== 'Done').forEach(t => {
-    const key = t.sourceName || 'Other'
-    if (!tasksBySource[key]) tasksBySource[key] = { tasks: [], url: t.url }
-    tasksBySource[key].tasks.push(t)
+  const filtered = filter === 'inprogress'
+    ? allActive.filter(t => t.status === 'In progress' || t.status === 'In Progress')
+    : filter === 'notstarted'
+    ? allActive.filter(t => t.status !== 'In progress' && t.status !== 'In Progress')
+    : allActive
+
+  const done = (state.tasks || []).filter(t => t.done || t.status === 'Done' || t.status === 'Complete' || t.status === 'Completed')
+
+  // Group by category
+  const byCategory = {}
+  filtered.forEach(t => {
+    const cat = categorizeTask(t)
+    if (!byCategory[cat]) byCategory[cat] = []
+    byCategory[cat].push(t)
   })
 
+  // Task counts per source doc (for chips)
+  const sourceCounts = {}
+  allActive.forEach(t => { const n = t.sourceName || 'Other'; sourceCounts[n] = (sourceCounts[n] || 0) + 1 })
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* Drive Tasks — two-column view */}
-      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <TaskColumn label="In Progress" tasks={inProgress} count={inProgress.length} />
-        <TaskColumn label="Not Started" tasks={notStarted} count={notStarted.length} />
+    <div className="flex flex-col gap-5">
+
+      {/* Connected Drive Sources */}
+      <div className="panel p-3">
+        <div className="flex items-center gap-2 mb-2.5">
+          <span className="text-[9.5px] font-bold uppercase tracking-wider text-ink-muted">Connected Google Drive Sources</span>
+          <span className="text-[9px] text-ink-muted">· auto-syncs 4× daily · click any doc to edit directly</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {DRIVE_SOURCE_DOCS.map(doc => (
+            <a key={doc.name} href={doc.url} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border hover:border-teal hover:bg-teal/5 transition-colors group">
+              <span className="text-[11.5px] font-medium text-ink group-hover:text-teal transition-colors">{doc.name}</span>
+              {sourceCounts[doc.name] > 0 && (
+                <span className="text-[9px] bg-teal/10 text-teal px-1.5 py-0.5 rounded-full font-bold">
+                  {sourceCounts[doc.name]}
+                </span>
+              )}
+              <span className="text-[10px] text-ink-muted group-hover:text-teal">↗</span>
+            </a>
+          ))}
+        </div>
       </div>
 
-      {/* Tasks by Drive Source — each card links to its document */}
-      {Object.keys(tasksBySource).length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="section-title">By Source Document</div>
-            <span className="text-[10px] text-ink-muted">
-              {(state.tasks || []).filter(t => !t.done && t.status !== 'Done').length} open · click ↗ to edit in Drive
-            </span>
-          </div>
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-            {Object.entries(tasksBySource).map(([sourceName, { tasks: srcTasks, url: srcUrl }]) => {
-              const open = srcTasks.filter(t => t.status !== 'Done' && t.status !== 'Complete')
-              if (open.length === 0) return null
-              return (
-                <div key={sourceName} className="panel">
-                  <div className="panel-header">
-                    <div className="text-sm font-semibold text-ink truncate flex-1">{sourceName}</div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[10px] bg-surface2 text-ink-muted px-1.5 py-0.5 rounded font-semibold">{open.length} open</span>
-                      {srcUrl && (
-                        <a href={srcUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-[11px] text-teal hover:underline font-medium"
-                          title="Open in Google Drive">↗ Edit</a>
-                      )}
-                    </div>
-                  </div>
-                  <div className="divide-y divide-border">
-                    {open.map(t => (
-                      <div key={t.id} className="px-4 py-2.5 flex items-start gap-2.5 group">
-                        <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-                          style={{ background: CATEGORY_COLORS[categorizeTask(t)] || '#BBBBBB' }} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[12px] text-ink leading-snug">{t.title}</div>
-                          {t.dueDate && (
-                            <div className="text-[10px] text-ink-muted mt-0.5">Due {t.dueDate}</div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+      {/* Status filter + count */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-1 p-1 rounded-lg" style={{ background: '#EEEEEE', width: 'fit-content' }}>
+          {[['all', 'All'], ['inprogress', 'In Progress'], ['notstarted', 'Not Started']].map(([v, label]) => (
+            <button key={v} onClick={() => setFilter(v)}
+              className="text-xs font-semibold px-3 py-1.5 rounded-md transition-all"
+              style={filter === v
+                ? { background: '#FFFFFF', color: '#0D9E9E', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }
+                : { color: '#58595b' }}>
+              {label}
+            </button>
+          ))}
         </div>
+        <span className="text-[11px] text-ink-muted">{filtered.length} task{filtered.length !== 1 ? 's' : ''}</span>
+      </div>
+
+      {/* Category Sections */}
+      {filtered.length === 0 ? (
+        <EmptyState message="No tasks match this filter." />
+      ) : (
+        CATEGORY_ORDER.map(cat => {
+          const tasks = byCategory[cat] || []
+          if (tasks.length === 0) return null
+          return (
+            <div key={cat} className="panel overflow-hidden">
+              <div className="panel-header" style={{
+                background: CATEGORY_COLORS[cat] + '12',
+                borderBottom: '1px solid ' + CATEGORY_COLORS[cat] + '30',
+              }}>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
+                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: CATEGORY_COLORS[cat] }}>{cat}</span>
+                </div>
+                <span className="text-[10.5px] text-ink-muted">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="divide-y divide-border">
+                {tasks.map(t => (
+                  <div key={t.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-surface2 group transition-colors">
+                    <div className="w-2 h-2 rounded-full mt-[5px] shrink-0 border"
+                      style={{
+                        background: t.status === 'In progress' || t.status === 'In Progress' ? '#0D9E9E' : 'white',
+                        borderColor: t.status === 'In progress' || t.status === 'In Progress' ? '#0D9E9E' : '#BBBBBB',
+                      }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[12.5px] text-ink leading-snug">{t.title}</div>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <span className="text-[10px] text-ink-muted">{t.sourceName}</span>
+                        {t.status === 'In progress' || t.status === 'In Progress' ? (
+                          <span className="text-[9px] font-semibold text-teal bg-teal/10 px-1.5 py-0.5 rounded-full">In Progress</span>
+                        ) : null}
+                        {t.dueDate && (
+                          <span className="text-[10px]" style={{ color: isOverdue(t.dueDate) ? '#B52B2B' : '#888' }}>
+                            · Due {t.dueDate}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {t.url && (
+                      <a href={t.url} target="_blank" rel="noopener noreferrer"
+                        className="opacity-0 group-hover:opacity-100 text-[11px] text-teal hover:underline shrink-0 mt-0.5 font-medium transition-opacity"
+                        title={`Open in Drive — ${t.sourceName || ''}`}>↗</a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })
       )}
 
+      {/* Completed */}
       <div className="panel p-4" style={{ borderColor: '#D8D8D8' }}>
         <TaskColumn label="Completed" tasks={done} count={done.length} dim collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
       </div>
