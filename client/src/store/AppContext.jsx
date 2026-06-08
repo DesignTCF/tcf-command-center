@@ -9,7 +9,7 @@ const initial = {
   manufacturing: [], content: [], decisions: [], intelligence: [],
   suppliers: [], purchasing: [], inventory: [], websiteProjects: [],
   contacts: [], calendar: [], importItems: [], alibabaCo: [],
-  gmailThreads: [], driveFiles: [], notionContent: [], notionPageTasks: [],
+  gmailThreads: [], driveFiles: [], driveTaskSources: [],
   brandHealth: { streak: 0, lastUpdated: null },
   doc: null, docLoading: false, docError: null,
   chatHistory: [],
@@ -38,8 +38,8 @@ function reducer(state, action) {
   }
 }
 
-const LOCAL_KEYS  = ['products','formulas','packaging','manufacturing','content','decisions','intelligence','contacts','brand-health','projects','suppliers','purchasing','inventory','website-projects','calendar','import-items','alibaba-convos','notion-page-tasks']
-const STATE_KEYS  = ['products','formulas','packaging','manufacturing','content','decisions','intelligence','contacts','brandHealth','projects','suppliers','purchasing','inventory','websiteProjects','calendar','importItems','alibabaCo','notionPageTasks']
+const LOCAL_KEYS  = ['products','formulas','packaging','manufacturing','content','decisions','intelligence','contacts','brand-health','projects','suppliers','purchasing','inventory','website-projects','calendar','import-items','alibaba-convos']
+const STATE_KEYS  = ['products','formulas','packaging','manufacturing','content','decisions','intelligence','contacts','brandHealth','projects','suppliers','purchasing','inventory','websiteProjects','calendar','importItems','alibabaCo']
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initial)
@@ -65,11 +65,10 @@ export function AppProvider({ children }) {
       return
     }
 
-    const [localResults, gmailResult, notionTasksResult, notionContentResult, driveResult, gcalResult] = await Promise.allSettled([
+    const [localResults, gmailResult, driveTasksResult, driveResult, gcalResult] = await Promise.allSettled([
       Promise.allSettled(LOCAL_KEYS.map(k => api.get(`/data/${k}`))),
       api.get('/gmail/threads?limit=40'),
-      api.get('/notion/tasks'),
-      api.get('/notion/content'),
+      api.get('/drive-tasks/tasks'),           // ← replaces Notion
       api.get('/drive/recent?limit=60'),
       api.get('/gcal/events'),
     ])
@@ -85,10 +84,11 @@ export function AppProvider({ children }) {
 
     if (gmailResult.status === 'fulfilled')
       dispatch({ type: 'SET', key: 'gmailThreads', value: gmailResult.value })
-    if (notionTasksResult.status === 'fulfilled')
-      dispatch({ type: 'SET', key: 'tasks', value: notionTasksResult.value })
-    if (notionContentResult.status === 'fulfilled')
-      dispatch({ type: 'SET', key: 'notionContent', value: notionContentResult.value })
+    if (driveTasksResult.status === 'fulfilled') {
+      const { tasks, sources } = driveTasksResult.value
+      dispatch({ type: 'SET', key: 'tasks', value: tasks || [] })
+      dispatch({ type: 'SET', key: 'driveTaskSources', value: sources || [] })
+    }
     if (driveResult.status === 'fulfilled')
       dispatch({ type: 'SET', key: 'driveFiles', value: driveResult.value })
     if (gcalResult.status === 'fulfilled')

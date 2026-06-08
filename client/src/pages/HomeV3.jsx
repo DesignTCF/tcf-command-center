@@ -280,14 +280,11 @@ export default function HomeV3() {
   const navigate = useNavigate()
 
   const focusTasks = useMemo(() => {
-    const notionTasks = (state.tasks || [])
+    return (state.tasks || [])
       .filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete')
       .filter(t => t.status === 'In progress' || t.status === 'In Progress')
-    const pageTasks = (state.notionPageTasks || [])
-      .filter(t => t.priority === 'High' && t.status !== 'Done' && t.status !== 'Complete')
-      .slice(0, 5)
-    return [...notionTasks, ...pageTasks].slice(0, 8)
-  }, [state.tasks, state.notionPageTasks])
+      .slice(0, 8)
+  }, [state.tasks])
 
   const openDecisions = useMemo(() =>
     (state.decisions || []).filter(d => !d.resolved), [state.decisions])
@@ -306,7 +303,7 @@ export default function HomeV3() {
     (state.suppliers || []).filter(s => s.status === 'Waiting').slice(0, 4),
   [state.suppliers])
 
-  const notionTasks = useMemo(() => {
+  const notionTasks = useMemo(() => {  // renamed would break JSX below — kept as alias
     const notDone   = (state.tasks || []).filter(t => t.status !== 'Done' && t.status !== 'Complete' && t.status !== 'Completed')
     const inProg    = notDone.filter(t => t.status === 'In progress' || t.status === 'In Progress')
     const notStart  = notDone.filter(t => t.status === 'Not started' || t.status === 'Not Started')

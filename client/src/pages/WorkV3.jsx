@@ -67,11 +67,7 @@ function CategoryDot({ task }) {
 
 // ─── Task row ───────────────────────────────────────────────────────────────
 
-function TaskRow({ task, dim, notionBaseUrl }) {
-  const url = notionBaseUrl
-    ? `${notionBaseUrl}/${task.id?.replace(/-/g, '')}`
-    : null
-
+function TaskRow({ task, dim }) {
   return (
     <div
       className="flex items-start gap-2 py-1.5"
@@ -95,14 +91,14 @@ function TaskRow({ task, dim, notionBaseUrl }) {
           {fmtDateShort(task.dueDate)}
         </span>
       )}
-      {url && (
+      {task.url && (
         <a
-          href={url}
+          href={task.url}
           target="_blank"
           rel="noreferrer"
           className="flex-shrink-0 text-xs"
           style={{ color: '#58595b', lineHeight: 1 }}
-          title="Open in Notion"
+          title={`Open in Drive — ${task.sourceName || ''}`}
         >
           ↗
         </a>
@@ -174,18 +170,18 @@ function AddTaskModal({ onClose }) {
     if (!form.title.trim()) return
     setSaving(true)
     try {
-      const res = await api.post('/notion/tasks', form)
-      dispatch({ type: 'ADD', key: 'tasks', value: { ...form, id: res?.id || String(Date.now()), status: 'Not started' } })
+      const res = await api.post('/drive-tasks/tasks', form)
+      dispatch({ type: 'ADD', key: 'tasks', value: { ...form, id: res?.id || String(Date.now()), status: 'Not started', source: 'drive' } })
       onClose()
     } catch (e) {
-      setErr('Could not add to Notion. Try again.')
+      setErr('Could not add to Drive. Try again.')
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <Modal title="Add Task to Notion" onClose={onClose}>
+    <Modal title="Add Task to Drive" onClose={onClose}>
       <div className="flex flex-col gap-3 p-4">
         <div>
           <label className="section-title block mb-1">Task Name</label>
@@ -220,7 +216,7 @@ function AddTaskModal({ onClose }) {
         <div className="flex gap-2 justify-end mt-1">
           <button className="btn-ghost text-xs px-3 py-1.5" onClick={onClose}>Cancel</button>
           <button className="btn-primary text-xs px-3 py-1.5" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Add to Notion'}
+            {saving ? 'Saving…' : 'Add to Drive'}
           </button>
         </div>
       </div>
@@ -235,13 +231,11 @@ function TasksTab() {
   const [showDone, setShowDone] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
 
-  // Notion live tasks
+  // Drive tasks — sourced from Google Drive docs/sheets
   const inProgress = (state.tasks || []).filter(t => t.status === 'In progress')
   const notStarted = (state.tasks || []).filter(t => t.status === 'Not started')
   const done = (state.tasks || []).filter(t => t.status === 'Done')
-
-  // TCF project tasks from Notion page content — grouped by category
-  const pageTasks = state.notionPageTasks || []
+  const pageTasks = []  // no longer used (was Notion page tasks)
   const tcfProjects = {
     'TCF House Brand': pageTasks.filter(t => ['t-tcf-1','t-tcf-2','t-tcf-3','t-tcf-4','t-tcf-5','t-tcf-6','t-tcf-7','t-tcf-8'].includes(t.id)),
     'TCF Website': pageTasks.filter(t => t.id.startsWith('t-web-')),
