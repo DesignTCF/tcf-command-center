@@ -28,16 +28,12 @@ jobs:
             server/package-lock.json
             client/package-lock.json
 
-      - name: Install server deps
-        run: cd server && npm install
-
       - name: Fetch fresh data from all sources
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_TODO_DB_ID: ${{ secrets.NOTION_TODO_DB_ID }}
-          GITHUB_TOKEN_TCF: ${{ secrets.TOKEN_GITHUB }}
-          GITHUB_USER: DesignTCF
-          NODE_PATH: ${{ github.workspace }}/server/node_modules
+          DRIVE_REFRESH_TOKEN: ${{ secrets.DRIVE_REFRESH_TOKEN }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_ACCOUNTS: design@thecosmeticformulary.com
         run: node scripts/fetch-data.js
 
       - name: Install client deps

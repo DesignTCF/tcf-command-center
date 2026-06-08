@@ -245,54 +245,75 @@ function TasksTab() {
     'Sip & Formulate': pageTasks.filter(t => t.id.startsWith('t-sip-')),
   }
 
+  // Group tasks by source document
+  const tasksBySource = {}
+  ;(state.tasks || []).filter(t => !t.done && t.status !== 'Done').forEach(t => {
+    const key = t.sourceName || 'Other'
+    if (!tasksBySource[key]) tasksBySource[key] = { tasks: [], url: t.url }
+    tasksBySource[key].tasks.push(t)
+  })
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Notion Live Tasks */}
+      {/* Drive Tasks — two-column view */}
       <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <TaskColumn label="In Progress" tasks={inProgress} count={inProgress.length} />
         <TaskColumn label="Not Started" tasks={notStarted} count={notStarted.length} />
       </div>
 
-      {/* TCF Project Tasks from Notion page content */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="section-title">TCF Open Items by Project</div>
-          <span className="text-[10px] text-ink-muted">Pulled from Notion • {pageTasks.filter(t => t.status !== 'Done').length} open</span>
-        </div>
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-          {Object.entries(tcfProjects).map(([projectName, tasks]) => {
-            const open = tasks.filter(t => t.status !== 'Done' && t.status !== 'Complete')
-            if (open.length === 0) return null
-            return (
-              <div key={projectName} className="panel">
-                <div className="panel-header">
-                  <div className="text-sm font-semibold text-ink">{projectName}</div>
-                  <span className="text-[10px] bg-surface2 text-ink-muted px-1.5 py-0.5 rounded font-semibold">{open.length} open</span>
-                </div>
-                <div className="divide-y divide-border">
-                  {open.map(t => (
-                    <div key={t.id} className="px-4 py-2.5 flex items-start gap-2.5">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${t.priority === 'High' ? 'bg-amber' : t.priority === 'Medium' ? 'bg-teal' : 'bg-surface3'}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-ink leading-snug">{t.title}</div>
-                        {t.notes && <div className="text-[11px] text-ink-muted mt-0.5 truncate">{t.notes}</div>}
-                      </div>
-                      <span className="text-[9.5px] text-ink-muted shrink-0">{t.category}</span>
+      {/* Tasks by Drive Source — each card links to its document */}
+      {Object.keys(tasksBySource).length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="section-title">By Source Document</div>
+            <span className="text-[10px] text-ink-muted">
+              {(state.tasks || []).filter(t => !t.done && t.status !== 'Done').length} open · click ↗ to edit in Drive
+            </span>
+          </div>
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+            {Object.entries(tasksBySource).map(([sourceName, { tasks: srcTasks, url: srcUrl }]) => {
+              const open = srcTasks.filter(t => t.status !== 'Done' && t.status !== 'Complete')
+              if (open.length === 0) return null
+              return (
+                <div key={sourceName} className="panel">
+                  <div className="panel-header">
+                    <div className="text-sm font-semibold text-ink truncate flex-1">{sourceName}</div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[10px] bg-surface2 text-ink-muted px-1.5 py-0.5 rounded font-semibold">{open.length} open</span>
+                      {srcUrl && (
+                        <a href={srcUrl} target="_blank" rel="noopener noreferrer"
+                          className="text-[11px] text-teal hover:underline font-medium"
+                          title="Open in Google Drive">↗ Edit</a>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  <div className="divide-y divide-border">
+                    {open.map(t => (
+                      <div key={t.id} className="px-4 py-2.5 flex items-start gap-2.5 group">
+                        <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                          style={{ background: CATEGORY_COLORS[categorizeTask(t)] || '#BBBBBB' }} />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[12px] text-ink leading-snug">{t.title}</div>
+                          {t.dueDate && (
+                            <div className="text-[10px] text-ink-muted mt-0.5">Due {t.dueDate}</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="panel p-4" style={{ borderColor: '#D8D8D8' }}>
         <TaskColumn label="Completed" tasks={done} count={done.length} dim collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
       </div>
 
       <div>
-        <button className="btn-primary text-xs px-3 py-2" onClick={() => setAddOpen(true)}>+ Add to Notion</button>
+        <button className="btn-primary text-xs px-3 py-2" onClick={() => setAddOpen(true)}>+ Add Task</button>
       </div>
       {addOpen && <AddTaskModal onClose={() => setAddOpen(false)} />}
     </div>

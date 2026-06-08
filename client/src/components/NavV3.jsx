@@ -45,8 +45,8 @@ function SyncButton({ onSync, syncing, syncedAt, serverUp }) {
   }
 
   const tooltip = serverUp
-    ? 'Re-fetch from Notion, Google Calendar, and Drive — updates dashboard immediately'
-    : 'Reload latest data — dashboard auto-refreshes 4× per day from all sources'
+    ? 'Re-fetch from Google Drive and Calendar — updates dashboard immediately'
+    : 'Reload latest data — dashboard auto-refreshes 4× per day from Google Drive'
 
   return (
     <div className="flex items-center gap-2 shrink-0">

@@ -477,12 +477,12 @@ export default function HomeV3() {
       {/* ── RIGHT COLUMN ── */}
       <div style={{ width: 280, flexShrink: 0 }} className="flex flex-col gap-4">
 
-        {/* Notion Tasks */}
+        {/* Drive Tasks */}
         <div className="panel">
           <div className="panel-header">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#0D9E9E] inline-block" />
-              <span className="section-title">From Notion</span>
+              <span className="section-title">Drive To-Dos</span>
             </div>
             <span className="text-[10.5px] text-[#58595b]">{notionTasks.length} open</span>
           </div>
@@ -491,13 +491,20 @@ export default function HomeV3() {
               <div className="text-[11.5px] text-[#58595b] py-2 text-center">All tasks complete</div>
             )}
             {notionTasks.map(task => (
-              <div key={task.id} className="flex items-start gap-2 py-1">
+              <div key={task.id} className="flex items-start gap-2 py-1 group">
                 <div className="mt-[2px] w-[14px] h-[14px] rounded-full border flex-shrink-0"
                   style={{ borderColor: task.status === 'In progress' || task.status === 'In Progress' ? '#0D9E9E' : '#BBBBBB', background: 'white' }} />
                 <div className="flex-1 min-w-0">
                   <div className="text-[11.5px] text-[#1A1A1A] leading-snug line-clamp-2 mb-0.5">{task.title}</div>
-                  <StatusBadge status={task.status} />
+                  {task.sourceName && (
+                    <div className="text-[9.5px] text-[#58595b]">{task.sourceName}</div>
+                  )}
                 </div>
+                {task.url && (
+                  <a href={task.url} target="_blank" rel="noopener noreferrer"
+                    className="flex-shrink-0 text-[11px] text-[#BBBBBB] hover:text-[#0D9E9E] opacity-0 group-hover:opacity-100 transition-opacity mt-0.5"
+                    title={`Open in Drive — ${task.sourceName || ''}`}>↗</a>
+                )}
               </div>
             ))}
           </div>

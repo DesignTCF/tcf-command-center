@@ -2,7 +2,6 @@
 // Fetches fresh data from all live sources and writes to data/ JSON files
 // Run before each GitHub Pages build to keep static site current
 
-// env vars come from GitHub Secrets in CI, or .env locally
 try { require('dotenv').config({ path: '../.env' }) } catch {}
 const fs = require('fs')
 const path = require('path')
@@ -27,108 +26,163 @@ function httpGet(url, headers = {}) {
   })
 }
 
-async function notionPost(endpoint, body) {
-  const token = process.env.NOTION_TOKEN
-  if (!token) return null
+// ── Google OAuth token refresh ────────────────────────────────────────────────
+async function refreshAccessToken() {
+  const refreshToken = process.env.DRIVE_REFRESH_TOKEN
+  if (!refreshToken) return null
+
   return new Promise((resolve, reject) => {
-    const data = JSON.stringify(body)
+    const body = [
+      `client_id=${encodeURIComponent(process.env.GMAIL_CLIENT_ID || '')}`,
+      `client_secret=${encodeURIComponent(process.env.GMAIL_CLIENT_SECRET || '')}`,
+      `refresh_token=${encodeURIComponent(refreshToken)}`,
+      `grant_type=refresh_token`,
+    ].join('&')
+
     const req = https.request({
-      hostname: 'api.notion.com',
-      path: endpoint,
+      hostname: 'oauth2.googleapis.com',
+      path: '/token',
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28',
-        'Content-Length': Buffer.byteLength(data),
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(body),
       },
     }, res => {
-      let body = ''
-      res.on('data', d => body += d)
-      res.on('end', () => resolve(JSON.parse(body)))
+      let data = ''
+      res.on('data', d => data += d)
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)) } catch { reject(new Error('Invalid token response')) }
+      })
     })
     req.on('error', reject)
-    req.write(data)
+    req.write(body)
     req.end()
   })
 }
 
-// ── Notion Tasks ──────────────────────────────────────────────────────────────
-async function fetchNotionTasks() {
-  try {
-    const dbId = process.env.NOTION_TODO_DB_ID || '337162124ddd80508602d598cd2896da'
-    const result = await notionPost(`/v1/databases/${dbId}/query`, {
-      sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
-      page_size: 100,
-    })
-    if (!result?.results) return
+// ── Drive task parsers (mirrors server/routes/drive-tasks.js) ─────────────────
 
-    function getText(prop) {
-      if (!prop) return ''
-      if (prop.title) return prop.title.map(t => t.plain_text).join('')
-      if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('')
-      return ''
+function parseDocTasks(text, sourceName, sourceUrl) {
+  const tasks = []
+  let currentGroup = sourceName
+  let id = 0
+
+  for (const raw of text.split('\n')) {
+    const line = raw.trim()
+    if (!line) continue
+
+    // Headings become group context
+    if (!line.startsWith('*') && !line.startsWith('-') && !line.match(/^\[/) && !line.match(/^\d+\./) && line.length < 80 && line.length > 2) {
+      currentGroup = line.replace(/^#+\s*/, '').trim()
+      continue
     }
 
-    const tasks = result.results.map(page => {
-      const props = page.properties || {}
-      const titleProp = props['Task name'] || props['Name'] || props['Title'] || Object.values(props).find(p => p.type === 'title')
-      const statusVal = props['Status']
-      const statusName = statusVal?.status?.name || statusVal?.select?.name || ''
-      return {
-        id: page.id,
-        title: getText(titleProp),
-        status: statusName,
-        dueDate: props['Due date']?.date?.start || props['Due Date']?.date?.start || null,
-        url: page.url,
-        lastEdited: page.last_edited_time,
-        done: statusName === 'Done',
-        source: 'notion',
-      }
-    })
+    // Checkbox: [ ] or [x]
+    const checkMatch = line.match(/^[\*\-]?\s*\[([xX ]?)\]\s+(.+)$/)
+    if (checkMatch) {
+      const done = checkMatch[1].toLowerCase() === 'x'
+      const title = checkMatch[2].trim()
+      if (title.length < 3) continue
+      tasks.push({
+        id: `drive-${sourceName.replace(/\s+/g, '-').toLowerCase()}-${++id}`,
+        title, status: done ? 'Done' : 'Not started', done,
+        group: currentGroup, source: 'drive', sourceName,
+        dueDate: null, url: sourceUrl,
+      })
+      continue
+    }
 
-    write('notion-tasks.json', tasks)
-    log(`✓ Notion tasks: ${tasks.length}`)
-  } catch (err) {
-    log(`✗ Notion tasks: ${err.message}`)
+    // Numbered list: 1. Task text
+    const numMatch = line.match(/^(\d+)\.\s+(.+)$/)
+    if (numMatch) {
+      const raw2 = numMatch[2]
+      const title = raw2.replace(/\(.*?\)/g, '').trim()
+      if (title.length < 3) continue
+      const ownerMatch = raw2.match(/\(([^)]+)\)/)
+      tasks.push({
+        id: `drive-${sourceName.replace(/\s+/g, '-').toLowerCase()}-${++id}`,
+        title, status: 'Not started', done: false,
+        group: currentGroup, source: 'drive', sourceName,
+        assignee: ownerMatch ? ownerMatch[1] : null,
+        dueDate: null, url: sourceUrl,
+      })
+    }
   }
+  return tasks
 }
 
-// ── Notion Content Calendar ───────────────────────────────────────────────────
-async function fetchNotionContent() {
-  try {
-    const CONTENT_DB_ID = '34116212-4ddd-80a4-8b44-fe0a634c2ef2'
-    const result = await notionPost(`/v1/databases/${CONTENT_DB_ID}/query`, {
-      sorts: [{ property: 'Publish date', direction: 'descending' }],
-      page_size: 50,
-    })
-    if (!result?.results) return
+function parseSheetTasks(csv, sourceName, sourceUrl) {
+  const lines = csv.split('\n').map(l => l.trim()).filter(Boolean)
+  if (lines.length < 2) return []
 
-    function getText(prop) {
-      if (!prop) return ''
-      if (prop.title) return prop.title.map(t => t.plain_text).join('')
-      if (prop.rich_text) return prop.rich_text.map(t => t.plain_text).join('')
-      return ''
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim().toLowerCase())
+  const tasks = []
+  let lastCategory = sourceName
+  let id = 0
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || lines[i].split(',')
+    const row = {}
+    headers.forEach((h, idx) => { row[h] = (cols[idx] || '').replace(/^"|"$/g, '').trim() })
+
+    const action = row['action'] || row['task'] || row['item'] || ''
+    if (!action || action.length < 3) continue
+    if (row['category'] && row['category'].length > 1) lastCategory = row['category']
+
+    const rawStatus = (row['status'] || '').toLowerCase()
+    const done = rawStatus.includes('complete') || rawStatus.includes('done')
+
+    tasks.push({
+      id: `drive-${sourceName.replace(/\s+/g, '-').toLowerCase()}-${++id}`,
+      title: action, status: row['status'] || 'Not started', done,
+      group: lastCategory, source: 'drive', sourceName,
+      assignee: row['owner'] || null,
+      dueDate: row['deadline'] || row['due date'] || row['due'] || null,
+      priority: row['priority'] || null,
+      notes: row['notes'] || null,
+      url: sourceUrl,
+    })
+  }
+  return tasks
+}
+
+// ── Drive Tasks ───────────────────────────────────────────────────────────────
+const DRIVE_SOURCES = [
+  { id: '1ofvcpceHYsEt7I-dwZXA78YycDH0WsdhlbUVlI0lYJA', name: 'TCF to-do List',             type: 'doc',   url: 'https://docs.google.com/document/d/1ofvcpceHYsEt7I-dwZXA78YycDH0WsdhlbUVlI0lYJA/edit' },
+  { id: '1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM', name: "Katherine's Notes",           type: 'doc',   url: 'https://docs.google.com/document/d/1hg66MmORP86JiuprbWGV0d3r480A31mCpm47GBYcnxM/edit' },
+  { id: '1iPMeoBklpr90wV553ZGnYCsKqsmk4Jb9ww6kK-TXGjI', name: 'Salt Spa Action Items',      type: 'sheet', url: 'https://docs.google.com/spreadsheets/d/1iPMeoBklpr90wV553ZGnYCsKqsmk4Jb9ww6kK-TXGjI/edit' },
+  { id: '1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw', name: 'Action Items – Class & Retail', type: 'doc', url: 'https://docs.google.com/document/d/1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw/edit' },
+]
+
+async function fetchDriveTasks() {
+  try {
+    const tokenRes = await refreshAccessToken()
+    if (!tokenRes?.access_token) {
+      log('⚠ DRIVE_REFRESH_TOKEN not set — skipping Drive task fetch')
+      return
+    }
+    const accessToken = tokenRes.access_token
+
+    const allTasks = []
+    for (const source of DRIVE_SOURCES) {
+      try {
+        const mimeType = source.type === 'sheet' ? 'text/csv' : 'text/plain'
+        const exportUrl = `https://www.googleapis.com/drive/v3/files/${source.id}/export?mimeType=${encodeURIComponent(mimeType)}`
+        const content = await httpGet(exportUrl, { 'Authorization': `Bearer ${accessToken}` })
+        const tasks = source.type === 'sheet'
+          ? parseSheetTasks(content, source.name, source.url)
+          : parseDocTasks(content, source.name, source.url)
+        allTasks.push(...tasks)
+        log(`✓ "${source.name}": ${tasks.length} tasks`)
+      } catch (err) {
+        log(`✗ "${source.name}": ${err.message}`)
+      }
     }
 
-    const content = result.results.map(page => {
-      const props = page.properties || {}
-      const titleProp = props['Content name'] || props['Name'] || Object.values(props).find(p => p.type === 'title')
-      return {
-        id: page.id,
-        title: getText(titleProp),
-        status: props['Status']?.select?.name || '',
-        platform: (props['Platform']?.multi_select || []).map(s => s.name),
-        contentType: props['Content type']?.select?.name || '',
-        publishDate: props['Publish date']?.date?.start || null,
-        url: page.url,
-      }
-    })
-
-    write('notion-content.json', content)
-    log(`✓ Notion content: ${content.length}`)
+    write('drive-tasks.json', allTasks)
+    log(`✓ Drive tasks total: ${allTasks.length}`)
   } catch (err) {
-    log(`✗ Notion content: ${err.message}`)
+    log(`✗ Drive tasks: ${err.message}`)
   }
 }
 
@@ -185,8 +239,8 @@ function parseICSDate(str) {
   str = str.trim()
   if (/^\d{8}$/.test(str)) return `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}`
   if (/^\d{8}T\d{6}/.test(str)) {
-    const d = str.replace('Z','')
-    return new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T${d.slice(9,11)}:${d.slice(11,13)}:${d.slice(13,15)}${str.endsWith('Z')?'Z':''}`).toISOString()
+    const d = str.replace('Z', '')
+    return new Date(`${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}T${d.slice(9,11)}:${d.slice(11,13)}:${d.slice(13,15)}${str.endsWith('Z') ? 'Z' : ''}`).toISOString()
   }
   return str
 }
@@ -216,10 +270,7 @@ async function fetchDriveSources() {
         source.contentType = contentType
         source.lastFetched = new Date().toISOString()
         source.error = null
-
-        if (contentType === 'csv') {
-          source.parsed = parseCSV(raw)
-        }
+        if (contentType === 'csv') source.parsed = parseCSV(raw)
         source.summary = buildSummary(source)
         updated++
       } catch (err) {
@@ -260,9 +311,9 @@ function buildSummary(source) {
   if (source.contentType === 'csv') {
     const { headers, rows, rowCount } = source.parsed || {}
     const sample = (rows || []).slice(0, 5).map(r =>
-      Object.entries(r).filter(([k,v]) => v && k).slice(0, 4).map(([k,v]) => `${k}: ${v}`).join(' | ')
+      Object.entries(r).filter(([k, v]) => v && k).slice(0, 4).map(([k, v]) => `${k}: ${v}`).join(' | ')
     ).join('\n')
-    return `Spreadsheet: ${source.label}\nColumns: ${(headers||[]).filter(h=>h).join(', ')}\nRows: ${rowCount}\nSample:\n${sample}`
+    return `Spreadsheet: ${source.label}\nColumns: ${(headers || []).filter(h => h).join(', ')}\nRows: ${rowCount}\nSample:\n${sample}`
   }
   if (source.contentType === 'text') {
     return `Document: ${source.label}\nContent preview:\n${source.rawContent?.slice(0, 800)}`
@@ -274,8 +325,7 @@ function buildSummary(source) {
 async function main() {
   log('Starting data refresh...')
   await Promise.all([
-    fetchNotionTasks(),
-    fetchNotionContent(),
+    fetchDriveTasks(),
     fetchGoogleCalendar(),
     fetchDriveSources(),
   ])
