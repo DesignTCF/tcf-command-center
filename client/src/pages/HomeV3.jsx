@@ -2,8 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppContext'
 import { fmtDateShort, isOverdue } from '../lib/utils'
-import StatusBadge from '../components/StatusBadge'
-import api from '../lib/api'
+import staticData from '../data/staticData'
 
 const BRANDS = [
   { name: 'NeVoo',         client: 'Molly Smith',       color: '#0D9E9E' },
@@ -15,15 +14,15 @@ const BRANDS = [
 
 const COMPLETE_STATUSES = new Set(['Ready', 'Approved', 'Live', 'Ready To Launch'])
 const INDEV_STATUSES    = new Set(['In Development', 'Formulating'])
-const TESTING_STATUSES  = new Set(['Stability Testing'])
 
 const QUICK_LINKS = [
-  { label: 'QuickBooks',    url: 'https://accounts.intuit.com/',    group: 'Business' },
-  { label: 'HubSpot',       url: 'https://app.hubspot.com/',         group: 'Business' },
-  { label: 'Shopify',       url: 'https://accounts.shopify.com/',    group: 'Business' },
-  { label: 'Alibaba',       url: 'https://login.alibaba.com/',       group: 'Suppliers' },
-  { label: 'Bulk Apothecary', url: 'https://bulkapothecary.com/',    group: 'Suppliers' },
-  { label: 'Chunbai (Doria)', url: 'https://alibaba.com/',           group: 'Suppliers' },
+  { label: 'QuickBooks',      url: 'https://accounts.intuit.com/' },
+  { label: 'HubSpot',         url: 'https://app.hubspot.com/' },
+  { label: 'Shopify',         url: 'https://accounts.shopify.com/' },
+  { label: 'Alibaba',         url: 'https://login.alibaba.com/' },
+  { label: 'Bulk Apothecary', url: 'https://bulkapothecary.com/' },
+  { label: 'Drive',           url: 'https://drive.google.com/' },
+  { label: 'Gmail',           url: 'https://mail.google.com/' },
 ]
 
 function todayStr() {
@@ -31,242 +30,363 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 }
 
-function taskDot(title = '') {
-  const t = title.toLowerCase()
-  if (t.includes('packaging') || t.includes('approval')) return '#B52B2B'
-  if (t.includes('website') || t.includes('update')) return '#A86200'
-  return '#0D9E9E'
+function fmtRelative(isoStr) {
+  if (!isoStr) return null
+  const diff = Date.now() - new Date(isoStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 2)  return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24)  return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
 }
 
-// ── Live Clock ────────────────────────────────────────────────────────────────
-function LiveClock() {
+// ── Live Header ───────────────────────────────────────────────────────────────
+function Header({ onSync, syncing, syncedAt }) {
   const [now, setNow] = useState(new Date())
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })
-  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
   const h = now.getHours()
   const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+
+  const lastBaked = staticData.generatedAt
+  const lastSyncLabel = syncedAt
+    ? `Synced ${fmtRelative(syncedAt)}`
+    : lastBaked
+    ? `Data from ${fmtRelative(lastBaked)}`
+    : 'Static data'
 
   return (
-    <div className="panel p-4">
-      <div className="flex items-end justify-between">
-        <div>
-          <div className="text-[13px] font-medium text-ink-muted">{greeting}, Katherine</div>
-          <div className="text-[11px] text-ink-muted mt-0.5">{date}</div>
-        </div>
-        <div className="text-right">
-          <div className="text-[22px] font-bold text-ink tabular-nums leading-none">{time.split(' ')[0]}</div>
-          <div className="text-[11px] font-semibold text-teal mt-0.5">{time.split(' ')[1]}</div>
-        </div>
+    <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEEEEE] bg-white sticky top-0 z-10">
+      <div>
+        <div className="text-[15px] font-semibold text-[#1A1A1A]">{greeting}, Katherine</div>
+        <div className="text-[11px] text-[#58595b] mt-0.5">{date} · {time}</div>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-[10.5px] text-[#58595b]">{lastSyncLabel}</span>
+        <button
+          onClick={onSync}
+          disabled={syncing}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all"
+          style={{
+            background: syncing ? '#E5E5E5' : '#0D9E9E',
+            color: syncing ? '#999' : 'white',
+            cursor: syncing ? 'not-allowed' : 'pointer',
+          }}
+        >
+          <span style={{ display: 'inline-block', animation: syncing ? 'spin 1s linear infinite' : 'none' }}>↻</span>
+          {syncing ? 'Syncing…' : 'Sync'}
+        </button>
       </div>
     </div>
   )
 }
 
-// ── End of Day Recap ──────────────────────────────────────────────────────────
-const RECAP_KEY = `tcf-recap-${todayStr()}`
-
-function EndOfDayRecap({ calendarEvents, tasks }) {
-  const [items, setItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(RECAP_KEY) || '[]') } catch { return [] }
-  })
-  const [input, setInput] = useState('')
-  const [adding, setAdding] = useState(false)
-
-  function save(newItems) {
-    setItems(newItems)
-    localStorage.setItem(RECAP_KEY, JSON.stringify(newItems))
-    // Also persist to server if available
-    api.post('/data/daily-recap', { date: todayStr(), items: newItems }).catch(() => {})
-  }
-
-  function addItem() {
-    if (!input.trim()) return
-    const updated = [...items, { id: Date.now().toString(), text: input.trim(), ts: new Date().toISOString(), manual: true }]
-    save(updated)
-    setInput(''); setAdding(false)
-  }
-
-  function remove(id) {
-    save(items.filter(i => i.id !== id))
-  }
-
-  // Auto-add today's calendar events as suggested completions
-  const todayEvents = calendarEvents.filter(e => e.date === todayStr() && e.source !== 'gcal')
-  const doneTasks = tasks.filter(t => t.done && (t.lastEdited || '').startsWith(todayStr()))
-
-  return (
-    <div className="panel">
-      <div className="panel-header">
-        <span className="section-title">End of Day Recap</span>
-        <span className="text-[10px] text-ink-muted">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-      </div>
-      <div className="p-3 flex flex-col gap-2">
-
-        {/* Auto-suggested from today's events */}
-        {todayEvents.map(ev => {
-          const already = items.find(i => i.id === `ev-${ev.id}`)
-          return !already ? (
-            <div key={ev.id} className="flex items-center gap-2 py-1 px-2 rounded-lg bg-teal/5 border border-teal/20">
-              <span className="text-teal text-[11px] shrink-0">📅</span>
-              <span className="text-[11px] text-ink flex-1 leading-snug line-clamp-1">{ev.title}</span>
-              <button
-                onClick={() => save([...items, { id: `ev-${ev.id}`, text: ev.title, ts: new Date().toISOString(), auto: true }])}
-                className="text-[10px] text-teal hover:underline shrink-0 font-medium"
-              >
-                Mark done
-              </button>
-            </div>
-          ) : null
-        })}
-
-        {doneTasks.slice(0, 3).map(t => {
-          const already = items.find(i => i.id === `task-${t.id}`)
-          return !already ? (
-            <div key={t.id} className="flex items-center gap-2 py-1 px-2 rounded-lg bg-green-50 border border-green-200">
-              <span className="text-[11px] shrink-0">✓</span>
-              <span className="text-[11px] text-ink flex-1 leading-snug line-clamp-1">{t.title}</span>
-              <button
-                onClick={() => save([...items, { id: `task-${t.id}`, text: t.title, ts: new Date().toISOString(), auto: true }])}
-                className="text-[10px] text-green-600 hover:underline shrink-0 font-medium"
-              >
-                Add
-              </button>
-            </div>
-          ) : null
-        })}
-
-        {/* Logged items */}
-        {items.length === 0 && !adding && todayEvents.length === 0 && doneTasks.length === 0 && (
-          <div className="text-[11px] text-ink-muted py-2 text-center">Nothing logged yet today</div>
-        )}
-        {items.map(item => (
-          <div key={item.id} className="flex items-start gap-2 py-0.5 group">
-            <span className="text-green-600 text-[12px] mt-0.5 shrink-0">✓</span>
-            <span className="text-[11.5px] text-ink leading-snug flex-1">{item.text}</span>
-            <button onClick={() => remove(item.id)}
-              className="text-[10px] text-ink-muted hover:text-red opacity-0 group-hover:opacity-100 shrink-0">✕</button>
-          </div>
-        ))}
-
-        {/* Add input */}
-        {adding ? (
-          <div className="flex gap-1.5 mt-1">
-            <input
-              autoFocus
-              className="input-field text-xs flex-1"
-              placeholder="What did you accomplish?"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') addItem(); if (e.key === 'Escape') setAdding(false) }}
-            />
-            <button onClick={addItem} className="btn-primary text-xs px-2 py-1">Add</button>
-            <button onClick={() => { setAdding(false); setInput('') }} className="btn-ghost text-xs px-2 py-1">✕</button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setAdding(true)}
-            className="mt-1 w-full text-left text-[11px] text-ink-muted hover:text-teal px-2 py-1.5 rounded-lg border border-dashed border-border hover:border-teal/40 transition-colors"
-          >
-            + Log an accomplishment
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ── Immediate Actions ─────────────────────────────────────────────────────────
-function ImmediateActions({ tasks, suppliers, calendar, gmailThreads }) {
-  const today = todayStr()
+// ── Needs Attention ───────────────────────────────────────────────────────────
+function NeedsAttention({ tasks, suppliers, serverUp }) {
   const now = new Date()
 
-  const actions = useMemo(() => {
+  const items = useMemo(() => {
     const list = []
-
-    // Overdue tasks with a due date
-    tasks
-      .filter(t => !t.done && t.dueDate && new Date(t.dueDate) < now)
-      .slice(0, 3)
-      .forEach(t => list.push({
-        id: `task-${t.id}`, type: 'overdue',
-        text: t.title,
-        meta: `Task overdue since ${fmtDateShort(t.dueDate)}`,
-        link: '/work', urgency: 'high',
-      }))
 
     // Overdue supplier follow-ups
     suppliers
       .filter(s => s.status === 'Waiting' && s.nextFollowUp && new Date(s.nextFollowUp) <= now)
-      .slice(0, 2)
       .forEach(s => list.push({
-        id: `sup-${s.id}`, type: 'supplier',
-        text: `Follow up with ${s.supplier} — ${s.project}`,
-        meta: `Due ${fmtDateShort(s.nextFollowUp)}`,
-        link: '/work', urgency: 'high',
+        id: `sup-${s.id}`,
+        priority: 0,
+        label: 'FOLLOW-UP',
+        labelColor: '#B52B2B',
+        labelBg: '#FEE2E2',
+        text: `${s.supplier} — ${s.project}`,
+        meta: `Overdue since ${fmtDateShort(s.nextFollowUp)}`,
       }))
 
-    // Today's calendar events
-    calendar
-      .filter(e => e.date === today && e.source !== 'gcal')
-      .slice(0, 2)
-      .forEach(e => list.push({
-        id: `cal-${e.id}`, type: 'today',
-        text: e.title,
-        meta: 'On your calendar today',
-        link: '/calendar', urgency: 'medium',
-      }))
-
-    // Unread Gmail threads (most recent first)
-    gmailThreads
-      .filter(t => t.unread)
-      .slice(0, 2)
+    // Tasks with overdue due dates
+    tasks
+      .filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete' && t.dueDate && new Date(t.dueDate) < now)
       .forEach(t => list.push({
-        id: `gmail-${t.id}`, type: 'email',
-        text: `${t.from ? `From: ${t.from}` : 'Email'} — ${t.subject || '(no subject)'}`,
-        meta: 'Unread message',
-        link: '/work', urgency: 'medium',
+        id: `task-ov-${t.id}`,
+        priority: 1,
+        label: 'OVERDUE',
+        labelColor: '#B52B2B',
+        labelBg: '#FEE2E2',
+        text: t.title,
+        meta: `Due ${fmtDateShort(t.dueDate)}${t.sourceName ? ` · ${t.sourceName}` : ''}`,
+        url: t.url,
       }))
 
-    return list.slice(0, 6)
-  }, [tasks, suppliers, calendar, gmailThreads, today])
+    // In-progress tasks
+    tasks
+      .filter(t => !t.done && (t.status === 'In progress' || t.status === 'In Progress'))
+      .slice(0, 8)
+      .forEach(t => list.push({
+        id: `task-ip-${t.id}`,
+        priority: 2,
+        label: 'IN PROGRESS',
+        labelColor: '#0A7A7A',
+        labelBg: '#E6F7F7',
+        text: t.title,
+        meta: t.sourceName || t.category || '',
+        url: t.url,
+      }))
 
-  if (actions.length === 0) return null
+    // High-priority not-started
+    tasks
+      .filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete'
+        && t.status !== 'In progress' && t.status !== 'In Progress'
+        && (t.priority === 'High' || t.priority === 'Urgent'))
+      .slice(0, 5)
+      .forEach(t => list.push({
+        id: `task-hi-${t.id}`,
+        priority: 3,
+        label: 'HIGH',
+        labelColor: '#7C4A00',
+        labelBg: '#FEF3C7',
+        text: t.title,
+        meta: t.sourceName || t.category || '',
+        url: t.url,
+      }))
 
-  const URGENCY_STYLE = {
-    high:   { bar: 'bg-red-500',   bg: 'bg-red-50',   border: 'border-red-200',   text: 'text-red-700',   meta: 'text-red-500' },
-    medium: { bar: 'bg-amber-400', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-800', meta: 'text-amber-600' },
+    const seen = new Set()
+    return list
+      .filter(i => { if (seen.has(i.id)) return false; seen.add(i.id); return true })
+      .sort((a, b) => a.priority - b.priority)
+      .slice(0, 12)
+  }, [tasks, suppliers])
+
+  const urgentCount = items.filter(i => i.priority <= 1).length
+
+  if (items.length === 0) {
+    return (
+      <div className="panel">
+        <div className="panel-header">
+          <span className="section-title">Needs Attention</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: '#E6F7F7', color: '#0A7A7A' }}>All clear</span>
+        </div>
+        <div className="p-6 text-center text-[12px] text-[#58595b]">
+          {serverUp ? 'Nothing urgent right now.' : 'Sync to load live tasks from Drive.'}
+        </div>
+      </div>
+    )
   }
-
-  const TYPE_ICON = { overdue: '⚠', supplier: '📦', today: '📅', email: '✉' }
 
   return (
     <div className="panel">
       <div className="panel-header">
-        <span className="section-title">Immediate Actions</span>
-        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#FEE2E2', color: '#B91C1C' }}>
-          {actions.length}
+        <span className="section-title">Needs Attention</span>
+        <div className="flex items-center gap-2">
+          {urgentCount > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: '#FEE2E2', color: '#B52B2B' }}>
+              {urgentCount} urgent
+            </span>
+          )}
+          <Link to="/work" className="text-[10.5px] text-[#0D9E9E] hover:underline">All tasks →</Link>
+        </div>
+      </div>
+      <div className="divide-y divide-[#F0F0F0]">
+        {items.map(item => (
+          <div key={item.id} className="flex items-start gap-3 px-4 py-3 hover:bg-[#FAFAFA] transition-colors group">
+            <span
+              className="mt-[2px] text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 leading-tight whitespace-nowrap"
+              style={{ background: item.labelBg, color: item.labelColor }}
+            >
+              {item.label}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-[12.5px] text-[#1A1A1A] leading-snug">{item.text}</div>
+              {item.meta && <div className="text-[10.5px] text-[#58595b] mt-0.5">{item.meta}</div>}
+            </div>
+            {item.url && (
+              <a href={item.url} target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="shrink-0 text-[#BBBBBB] hover:text-[#0D9E9E] opacity-0 group-hover:opacity-100 transition-opacity text-[12px] mt-0.5"
+                title="Open in Drive">↗</a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Today ─────────────────────────────────────────────────────────────────────
+function Today({ calendar }) {
+  const today = todayStr()
+  const events = useMemo(() =>
+    calendar.filter(e => e.date === today).sort((a, b) => (a.time || '').localeCompare(b.time || '')),
+  [calendar, today])
+
+  return (
+    <div className="panel">
+      <div className="panel-header">
+        <span className="section-title">Today</span>
+        <span className="text-[10.5px] text-[#58595b]">
+          {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </span>
       </div>
-      <div className="p-3 flex flex-col gap-2">
-        {actions.map(a => {
-          const s = URGENCY_STYLE[a.urgency] || URGENCY_STYLE.medium
-          return (
-            <Link
-              key={a.id}
-              to={a.link}
-              className={`flex items-start gap-2.5 px-2.5 py-2 rounded-lg border ${s.bg} ${s.border} hover:opacity-80 transition-opacity`}
-            >
-              <span className="text-[13px] shrink-0 mt-0.5">{TYPE_ICON[a.type]}</span>
+      {events.length === 0 ? (
+        <div className="px-4 py-3 text-[11.5px] text-[#58595b]">Nothing scheduled today</div>
+      ) : (
+        <div className="divide-y divide-[#F0F0F0]">
+          {events.map(ev => (
+            <div key={ev.id} className="flex items-start gap-3 px-4 py-2.5">
+              {ev.time && (
+                <span className="text-[10.5px] text-[#0D9E9E] font-medium shrink-0 w-14 mt-0.5">
+                  {ev.time}
+                </span>
+              )}
               <div className="flex-1 min-w-0">
-                <div className={`text-[11.5px] font-medium leading-snug ${s.text} line-clamp-2`}>{a.text}</div>
-                <div className={`text-[10px] mt-0.5 ${s.meta}`}>{a.meta}</div>
+                <div className="text-[12px] text-[#1A1A1A] leading-snug">{ev.title}</div>
+                {ev.type && <div className="text-[10px] text-[#58595b] mt-0.5">{ev.type}</div>}
               </div>
-            </Link>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Brands ────────────────────────────────────────────────────────────────────
+function BrandsPanel({ products }) {
+  const navigate = useNavigate()
+  const rows = useMemo(() => BRANDS.map(b => {
+    const prods    = products.filter(p => p.clientBrand === b.name)
+    const complete = prods.filter(p => COMPLETE_STATUSES.has(p.status)).length
+    const inDev    = prods.filter(p => INDEV_STATUSES.has(p.status)).length
+    const total    = prods.length
+    const pct      = total > 0 ? Math.round((complete / total) * 100) : 0
+    return { ...b, total, complete, inDev, pct }
+  }), [products])
+
+  return (
+    <div className="panel">
+      <div className="panel-header">
+        <span className="section-title">Brands</span>
+        <Link to="/brands" className="text-[10.5px] text-[#0D9E9E] hover:underline">Details →</Link>
+      </div>
+      <div className="divide-y divide-[#F0F0F0]">
+        {rows.map(b => (
+          <div
+            key={b.name}
+            onClick={() => navigate(`/brands#${b.name.replace(/\s+/g, '')}`)}
+            className="flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] cursor-pointer transition-colors"
+          >
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: b.color }} />
+            <div style={{ width: 90, flexShrink: 0 }}>
+              <div className="text-[11.5px] font-semibold text-[#1A1A1A]">{b.name}</div>
+              <div className="text-[9.5px] text-[#58595b]">{b.client.split(' ')[0]}</div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9.5px] text-[#58595b]">
+                  {b.complete > 0 && <span style={{ color: b.color }}>{b.complete} ready</span>}
+                  {b.complete > 0 && b.inDev > 0 && <span className="text-[#D8D8D8]"> · </span>}
+                  {b.inDev > 0 && <span className="text-[#58595b]">{b.inDev} in dev</span>}
+                  {b.complete === 0 && b.inDev === 0 && <span className="text-[#BBBBBB]">no data</span>}
+                </span>
+                <span className="text-[9.5px] text-[#AAAAAA] ml-1">{b.pct}%</span>
+              </div>
+              <div className="h-[4px] rounded-full bg-[#EEEEEE] overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${b.pct}%`, background: b.color }} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Suppliers Waiting ─────────────────────────────────────────────────────────
+function SuppliersWaiting({ suppliers }) {
+  const waiting = useMemo(() =>
+    suppliers.filter(s => s.status === 'Waiting').slice(0, 4),
+  [suppliers])
+
+  if (waiting.length === 0) return null
+
+  return (
+    <div className="panel">
+      <div className="panel-header">
+        <span className="section-title">Suppliers — Waiting</span>
+        <Link to="/work" className="text-[10.5px] text-[#0D9E9E] hover:underline">All →</Link>
+      </div>
+      <div className="divide-y divide-[#F0F0F0]">
+        {waiting.map(s => (
+          <div key={s.id} className="px-4 py-2.5">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-[11.5px] font-medium text-[#1A1A1A]">{s.supplier}</div>
+                <div className="text-[10px] text-[#58595b] mt-0.5 line-clamp-1">{s.project}</div>
+              </div>
+              {s.nextFollowUp && (
+                <span className={`text-[10.5px] font-medium shrink-0 ${isOverdue(s.nextFollowUp) ? 'text-[#B52B2B]' : 'text-[#58595b]'}`}>
+                  {fmtDateShort(s.nextFollowUp)}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Quick Links ───────────────────────────────────────────────────────────────
+function QuickLinks() {
+  return (
+    <div className="panel">
+      <div className="panel-header"><span className="section-title">Quick Links</span></div>
+      <div className="p-3 flex flex-wrap gap-1.5">
+        {QUICK_LINKS.map(l => (
+          <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer"
+            className="px-2.5 py-1 rounded-full border border-[#DDDDDD] text-[11px] text-[#444444] hover:border-[#0D9E9E] hover:text-[#0D9E9E] transition-colors whitespace-nowrap">
+            {l.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Upcoming (next 7 days) ────────────────────────────────────────────────────
+function Upcoming({ calendar }) {
+  const upcoming = useMemo(() => {
+    const td  = new Date(); td.setHours(0,0,0,0)
+    const end = new Date(td); end.setDate(end.getDate() + 7)
+    return calendar
+      .filter(e => {
+        const d = new Date(e.date + 'T00:00:00')
+        return d > td && d <= end
+      })
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 5)
+  }, [calendar])
+
+  if (upcoming.length === 0) return null
+
+  return (
+    <div className="panel">
+      <div className="panel-header">
+        <span className="section-title">Upcoming</span>
+        <Link to="/calendar" className="text-[10.5px] text-[#0D9E9E] hover:underline">Calendar →</Link>
+      </div>
+      <div className="divide-y divide-[#F0F0F0]">
+        {upcoming.map(ev => {
+          const d = new Date(ev.date + 'T00:00:00')
+          const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+          return (
+            <div key={ev.id} className="flex items-start gap-3 px-4 py-2.5">
+              <div className="text-[10px] text-[#58595b] shrink-0 w-20 mt-0.5">{label}</div>
+              <div className="text-[11.5px] text-[#1A1A1A] leading-snug">{ev.title}</div>
+            </div>
           )
         })}
       </div>
@@ -274,291 +394,54 @@ function ImmediateActions({ tasks, suppliers, calendar, gmailThreads }) {
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomeV3() {
-  const { state } = useApp()
-  const navigate = useNavigate()
+  const { state, dispatch } = useApp()
 
-  const focusTasks = useMemo(() => {
-    return (state.tasks || [])
-      .filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete')
-      .filter(t => t.status === 'In progress' || t.status === 'In Progress')
-      .slice(0, 8)
+  const allTasks = useMemo(() => {
+    const live = state.tasks || []
+    if (live.length > 0) return live
+    return (staticData.notionPageTasks || []).map(t => ({ ...t, sourceName: 'TCF to-do List' }))
   }, [state.tasks])
 
-  const openDecisions = useMemo(() =>
-    (state.decisions || []).filter(d => !d.resolved), [state.decisions])
-
-  const brandRows = useMemo(() => BRANDS.map(b => {
-    const prods   = (state.products || []).filter(p => p.clientBrand === b.name)
-    const complete = prods.filter(p => COMPLETE_STATUSES.has(p.status)).length
-    const inDev    = prods.filter(p => INDEV_STATUSES.has(p.status)).length
-    const testing  = prods.filter(p => TESTING_STATUSES.has(p.status)).length
-    const total    = prods.length
-    const pct      = total > 0 ? Math.round((complete / total) * 100) : 0
-    return { ...b, total, complete, inDev, testing, pct }
-  }), [state.products])
-
-  const waitingSuppliers = useMemo(() =>
-    (state.suppliers || []).filter(s => s.status === 'Waiting').slice(0, 4),
-  [state.suppliers])
-
-  const notionTasks = useMemo(() => {  // renamed would break JSX below — kept as alias
-    const notDone   = (state.tasks || []).filter(t => t.status !== 'Done' && t.status !== 'Complete' && t.status !== 'Completed')
-    const inProg    = notDone.filter(t => t.status === 'In progress' || t.status === 'In Progress')
-    const notStart  = notDone.filter(t => t.status === 'Not started' || t.status === 'Not Started')
-    return [...inProg, ...notStart].slice(0, 10)
-  }, [state.tasks])
-
-  const contentItems = useMemo(() => {
-    const items = [...(state.content || [])]
-    const withDate = items.filter(c => c.publishDate || c.dueDate || c.date)
-    if (withDate.length >= 3) {
-      return withDate
-        .sort((a, b) => new Date(a.publishDate || a.dueDate || a.date) - new Date(b.publishDate || b.dueDate || b.date))
-        .slice(0, 5)
-    }
-    return items.slice(0, 5)
-  }, [state.content])
-
-  const calendarWithSource = useMemo(() =>
-    (state.calendar || []).map(e => ({ ...e, source: 'dashboard' })),
-  [state.calendar])
+  async function handleSync() {
+    if (state.syncing) return
+    dispatch({ type: 'SYNCING', value: true })
+    try {
+      await fetch(
+        'https://api.github.com/repos/DesignTCF/tcf-command-center/actions/workflows/refresh-and-deploy.yml/dispatches',
+        {
+          method: 'POST',
+          headers: { 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: 'main' }),
+        }
+      )
+    } catch {}
+    setTimeout(() => dispatch({ type: 'SYNCED' }), 3000)
+  }
 
   return (
-    <div className="page-scroll flex gap-5 min-h-full" style={{ paddingTop: '1.5rem' }}>
+    <div className="flex flex-col min-h-full">
+      <Header onSync={handleSync} syncing={state.syncing} syncedAt={state.syncedAt} />
 
-      {/* ── LEFT COLUMN ── */}
-      <div style={{ width: 300, flexShrink: 0 }} className="flex flex-col gap-4">
+      <div className="flex gap-5 p-6 flex-1" style={{ alignItems: 'flex-start' }}>
 
-        {/* Live Clock */}
-        <LiveClock />
-
-        {/* Today's Focus */}
-        <div className="panel">
-          <div className="panel-header">
-            <span className="section-title">Today's Focus</span>
-            <span className="text-[10.5px] text-[#58595b]">{focusTasks.length} active</span>
-          </div>
-          <div className="p-3 flex flex-col gap-1.5">
-            {focusTasks.length === 0 && (
-              <div className="text-[11.5px] text-[#58595b] py-2 text-center">No active tasks</div>
-            )}
-            {focusTasks.map(task => (
-              <Link
-                key={task.id}
-                to="/work"
-                className="flex items-start gap-2 py-1 px-1 rounded hover:bg-[#F5F5F5] transition-colors group"
-              >
-                <span className="mt-[4px] w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ backgroundColor: taskDot(task.title) }} />
-                <span className="text-[12px] text-[#1A1A1A] leading-snug group-hover:text-[#0D9E9E] transition-colors line-clamp-2">
-                  {task.title}
-                </span>
-              </Link>
-            ))}
-          </div>
+        {/* ── LEFT: main content ── */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4">
+          <NeedsAttention
+            tasks={allTasks}
+            suppliers={state.suppliers || []}
+            serverUp={state.serverUp}
+          />
+          <Today calendar={state.calendar || []} />
         </div>
 
-        {/* Immediate Actions */}
-        <ImmediateActions
-          tasks={state.tasks || []}
-          suppliers={state.suppliers || []}
-          calendar={calendarWithSource}
-          gmailThreads={state.gmailThreads || []}
-        />
-
-        {/* Open Decisions */}
-        <div className="panel">
-          <div className="panel-header">
-            <span className="section-title">Open Decisions</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: '#FAE5E5', color: '#B52B2B' }}>
-              {openDecisions.length}
-            </span>
-          </div>
-          <div className="p-3 flex flex-col gap-2.5">
-            {openDecisions.length === 0 && (
-              <div className="text-[11.5px] text-[#58595b] py-2 text-center">All decisions resolved</div>
-            )}
-            {openDecisions.slice(0, 3).map(d => (
-              <div key={d.id} className="border border-[#E5E5E5] rounded-[6px] p-2.5 bg-white">
-                <div className="text-[12px] font-semibold text-[#1A1A1A] leading-snug mb-1">{d.title}</div>
-                {d.context && <div className="text-[11px] text-[#58595b] leading-snug line-clamp-2">{d.context}</div>}
-              </div>
-            ))}
-            {openDecisions.length > 3 && (
-              <div className="text-[11px] text-[#58595b]">+{openDecisions.length - 3} more decisions</div>
-            )}
-          </div>
-        </div>
-
-      </div>
-
-      {/* ── MIDDLE COLUMN ── */}
-      <div className="flex-1 min-w-0 flex flex-col gap-4">
-
-        {/* Brands at a Glance */}
-        <div className="panel">
-          <div className="panel-header">
-            <span className="section-title">Brands at a Glance</span>
-            <span className="text-[11px] text-[#58595b]">{BRANDS.length} active brands</span>
-          </div>
-          <div className="divide-y divide-[#EEEEEE]">
-            {brandRows.map(b => (
-              <div
-                key={b.name}
-                onClick={() => navigate(`/brands#${b.name.replace(/\s+/g, '')}`)}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-[#F5F5F5] cursor-pointer transition-colors"
-                style={{ borderLeft: `3px solid ${b.color}` }}
-              >
-                <div style={{ width: 160, flexShrink: 0 }}>
-                  <div className="text-[13px] font-bold" style={{ color: b.color }}>{b.name}</div>
-                  <div className="text-[11px] text-[#58595b]">{b.client}</div>
-                </div>
-                <div style={{ width: 64, flexShrink: 0 }} className="text-center">
-                  <div className="text-[16px] font-bold text-[#1A1A1A]">{b.total}</div>
-                  <div className="text-[10px] text-[#58595b]">products</div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10.5px] text-[#58595b]">
-                      {b.complete > 0 && <span className="text-[#0A7A7A] font-semibold">{b.complete} Ready</span>}
-                      {b.complete > 0 && (b.inDev > 0 || b.testing > 0) && <span className="text-[#D8D8D8]"> · </span>}
-                      {b.inDev > 0 && <span className="text-[#2255AA]">{b.inDev} In Dev</span>}
-                      {b.inDev > 0 && b.testing > 0 && <span className="text-[#D8D8D8]"> · </span>}
-                      {b.testing > 0 && <span className="text-[#A86200]">{b.testing} Testing</span>}
-                      {b.complete === 0 && b.inDev === 0 && b.testing === 0 && <span className="text-[#58595b]">No data</span>}
-                    </span>
-                    <span className="text-[10px] text-[#58595b] ml-2 flex-shrink-0">{b.pct}%</span>
-                  </div>
-                  <div className="h-[6px] rounded-full bg-[#E5E5E5] overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style={{ width: `${b.pct}%`, backgroundColor: b.color }} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Supplier Tracker */}
-        <div className="panel">
-          <div className="panel-header">
-            <span className="section-title">Supplier Tracker — Waiting</span>
-            <Link to="/work" className="text-[11px] text-[#0D9E9E] hover:underline">View all</Link>
-          </div>
-          {waitingSuppliers.length === 0 ? (
-            <div className="p-4 text-[11.5px] text-[#58595b] text-center">No suppliers waiting</div>
-          ) : (
-            <table className="table-base">
-              <thead><tr><th>Supplier</th><th>Project</th><th>Waiting On</th><th>Follow-up</th></tr></thead>
-              <tbody>
-                {waitingSuppliers.map(s => (
-                  <tr key={s.id}>
-                    <td className="font-medium text-[#1A1A1A]">{s.supplier}</td>
-                    <td className="text-[#444444]">{s.project}</td>
-                    <td className="text-[#444444] max-w-[200px] truncate">{s.waitingOn || '—'}</td>
-                    <td>
-                      {s.nextFollowUp
-                        ? <span className={`text-[11.5px] font-medium ${isOverdue(s.nextFollowUp) ? 'text-[#B52B2B]' : 'text-[#444444]'}`}>{fmtDateShort(s.nextFollowUp)}</span>
-                        : <span className="text-[#58595b]">—</span>
-                      }
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* End of Day Recap */}
-        <EndOfDayRecap calendarEvents={calendarWithSource} tasks={state.tasks || []} />
-
-      </div>
-
-      {/* ── RIGHT COLUMN ── */}
-      <div style={{ width: 280, flexShrink: 0 }} className="flex flex-col gap-4">
-
-        {/* Drive Tasks */}
-        <div className="panel">
-          <div className="panel-header">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#0D9E9E] inline-block" />
-              <span className="section-title">Drive To-Dos</span>
-            </div>
-            <span className="text-[10.5px] text-[#58595b]">{notionTasks.length} open</span>
-          </div>
-          <div className="p-3 flex flex-col gap-1.5">
-            {notionTasks.length === 0 && (
-              <div className="text-[11.5px] text-[#58595b] py-2 text-center">All tasks complete</div>
-            )}
-            {notionTasks.map(task => (
-              <div key={task.id} className="flex items-start gap-2 py-1 group">
-                <div className="mt-[2px] w-[14px] h-[14px] rounded-full border flex-shrink-0"
-                  style={{ borderColor: task.status === 'In progress' || task.status === 'In Progress' ? '#0D9E9E' : '#BBBBBB', background: 'white' }} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[11.5px] text-[#1A1A1A] leading-snug line-clamp-2 mb-0.5">{task.title}</div>
-                  {task.sourceName && (
-                    <div className="text-[9.5px] text-[#58595b]">{task.sourceName}</div>
-                  )}
-                </div>
-                {task.url && (
-                  <a href={task.url} target="_blank" rel="noopener noreferrer"
-                    className="flex-shrink-0 text-[11px] text-[#BBBBBB] hover:text-[#0D9E9E] opacity-0 group-hover:opacity-100 transition-opacity mt-0.5"
-                    title={`Open in Drive — ${task.sourceName || ''}`}>↗</a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upcoming from Calendar */}
-        <div className="panel">
-          <div className="panel-header">
-            <span className="section-title">Upcoming</span>
-            <Link to="/calendar" className="text-[11px] text-[#0D9E9E] hover:underline">Full calendar</Link>
-          </div>
-          <div className="p-3 flex flex-col gap-2">
-            {(() => {
-              const td = new Date(); td.setHours(0,0,0,0)
-              const end = new Date(td); end.setDate(end.getDate() + 14)
-              const upcoming = calendarWithSource
-                .filter(e => { const d = new Date(e.date + 'T00:00:00'); return d >= td && d <= end })
-                .sort((a, b) => a.date.localeCompare(b.date))
-                .slice(0, 5)
-              if (!upcoming.length) return <div className="text-[11.5px] text-[#58595b] text-center py-2">No events in the next 14 days</div>
-              return upcoming.map(ev => (
-                <Link key={ev.id} to="/calendar" className="flex items-start gap-2 border-b border-[#EEEEEE] pb-2 last:border-0 last:pb-0 hover:opacity-70 transition-opacity">
-                  <div className="flex-shrink-0 w-10 text-center rounded py-1 bg-[#F5F5F5]">
-                    <div className="text-[9px] text-[#58595b] uppercase">{new Date(ev.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' })}</div>
-                    <div className="text-[14px] font-bold text-[#1A1A1A] leading-tight">{new Date(ev.date + 'T00:00:00').getDate()}</div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11.5px] font-medium text-[#1A1A1A] leading-snug line-clamp-1">{ev.title}</div>
-                    <div className="text-[10px] text-[#58595b] mt-0.5">{ev.type}{ev.brand ? ` · ${ev.brand}` : ''}</div>
-                  </div>
-                </Link>
-              ))
-            })()}
-          </div>
-        </div>
-
-        {/* Quick Links */}
-        <div className="panel">
-          <div className="panel-header"><span className="section-title">Quick Links</span></div>
-          <div className="p-3 flex flex-col gap-3">
-            {['Business', 'Suppliers'].map(group => (
-              <div key={group}>
-                <div className="text-[9.5px] font-bold uppercase tracking-wider text-[#58595b] mb-1.5">{group}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {QUICK_LINKS.filter(l => l.group === group).map(link => (
-                    <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded-full border border-[#BBBBBB] text-[11px] text-[#444444] hover:border-[#0D9E9E] hover:text-[#0D9E9E] transition-colors whitespace-nowrap">
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* ── RIGHT: sidebar ── */}
+        <div style={{ width: 300, flexShrink: 0 }} className="flex flex-col gap-4">
+          <BrandsPanel products={state.products || []} />
+          <SuppliersWaiting suppliers={state.suppliers || []} />
+          <Upcoming calendar={state.calendar || []} />
+          <QuickLinks />
         </div>
 
       </div>

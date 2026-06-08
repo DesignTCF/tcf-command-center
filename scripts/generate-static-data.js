@@ -205,6 +205,7 @@ const gcalEvents = (gcalCache.events || []).map(e => ({
 }))
 
 const staticData = {
+  generatedAt: new Date().toISOString(),
   products,
   formulas,
   packaging,
