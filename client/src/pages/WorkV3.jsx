@@ -21,109 +21,60 @@ const BRAND_COLORS = {
 
 const PIPELINE_STAGES = ['Formula', 'Packaging', 'Artwork', 'Launch']
 
-// ─── Task categorization ────────────────────────────────────────────────────
+// ─── Task categorization — 5 clean buckets ───────────────────────────────────
 
-const CATEGORIES = [
+const TASK_CATEGORIES = [
   {
-    key: 'Formulas & R&D',
-    color: '#157A50',
-    icon: '⚗',
-    test: (t, src) =>
-      /formula|inci|ingredient|batch|stability|formul|which formula|r&d|formulating|chemist|active|concentration|ph |preservative|emulsifier|surfactant|raw material/.test(t),
-  },
-  {
-    key: 'Packaging & Labels',
+    key: 'Formula & Packaging',
     color: '#A86200',
-    icon: '📦',
     test: (t, src) =>
-      /packaging|bottle|jar|tube|closure|pump|cap|dieline|label|artwork|print|silkscreen|finish|carton|box|container|airless|matte|gloss|frosted|pantone|upc|barcode|mockup|render|seal|fill weight|bottle direction|label system|packaging material|packaging direction/.test(t),
+      /formula|inci|ingredient|batch|stability|bottle|jar|tube|closure|pump|cap|dieline|label|artwork|print|silkscreen|carton|box|container|airless|pantone|upc|render|seal|fill weight/.test(t),
   },
   {
-    key: 'Website & Digital',
-    color: '#2255AA',
-    icon: '🌐',
-    test: (t, src) =>
-      /website|web |homepage|e-commerce|shopify|catalog|store|navigation|menu|landing|digital direction|site direction|page structure|mockup.*site|site.*mockup|catalog.*architecture|collection page|product page|booking.*flow|digital/.test(t),
-  },
-  {
-    key: 'Brand Identity & Design',
+    key: 'Brand & Website',
     color: '#5533AA',
-    icon: '✦',
     test: (t, src) =>
-      /brand identity|visual system|typography|color palette|logo|color strategy|design direction|visual direction|brand tone|brand story|reference.*visual|visual.*reference|mockup|concept mock|identity|brand direction|design system|creative/.test(t),
+      /website|web |homepage|catalog|store|navigation|digital direction|page structure|brand identity|visual system|typography|color palette|logo|design direction|visual direction|brand tone|mockup|identity|brand direction|creative|references|wireframe/.test(t),
   },
   {
-    key: 'Salt Spa — Legal & Finance',
-    color: '#B52B2B',
-    icon: '⚖',
-    test: (t, src) =>
-      src.includes('salt spa') && /agreement|legal|contract|lease|attorney|tax|ein|llc|operating agreement|waiver|consent|signage|financial model|cash flow|bank account|quickbooks|revenue|budget|distribution gate|financial review|financing|capital/.test(t),
-  },
-  {
-    key: 'Salt Spa — Build-out & Equipment',
-    color: '#C17F24',
-    icon: '🏗',
-    test: (t, src) =>
-      src.includes('salt spa') && /floor plan|build|install|furniture|equipment|hydrafacial|led|microcurrent|shelf|display|window|signage|partition|classroom|office|acoust|room|event space|mixing bar|refill bar|beauty bar|apothecary wall|front window/.test(t),
-  },
-  {
-    key: 'Salt Spa — Retail, Products & Hiring',
+    key: 'Salt Spa',
     color: '#157A50',
-    icon: '🛍',
-    test: (t, src) =>
-      src.includes('salt spa') && /retail|wholesale|inventory|hire|staff|position|train|commission|sku|apothecary|formulate|brand.*wall|pos|booking system|faire|catalog|trade show|product|import|vendor|exclusiv|merchandis|commission|return policy|checklist|cash handling/.test(t),
+    test: (t, src) => src.includes('salt spa'),
   },
   {
-    key: 'Client Brand Work',
+    key: 'Client Work',
     color: '#0D9E9E',
-    icon: '◈',
     test: (t, src) =>
-      /nevoo|daily rou|nitt beauty|devoted man|skin axis|sip.formulate|salt spa|client profile|molly smith|gamze|meredith|josh smith|andrew moss/.test(t),
+      /nevoo|daily rou|nitt beauty|devoted man|skin axis|sip.formulate|client profile|molly smith|gamze|meredith|josh smith|andrew moss/.test(t),
   },
   {
-    key: 'TCF — Operations & Compliance',
-    color: '#444444',
-    icon: '◎',
-    test: () => true, // catch-all
+    key: 'TCF Operations',
+    color: '#58595b',
+    test: () => true,
   },
 ]
 
 function categorizeTask(task) {
   const t = (task.title || '').toLowerCase()
   const src = (task.sourceName || '').toLowerCase()
-  for (const cat of CATEGORIES) {
+  for (const cat of TASK_CATEGORIES) {
     if (cat.test(t, src)) return cat.key
   }
-  return 'TCF — Operations & Compliance'
+  return 'TCF Operations'
 }
 
-const CATEGORY_COLORS = Object.fromEntries(CATEGORIES.map(c => [c.key, c.color]))
-const CATEGORY_ICONS  = Object.fromEntries(CATEGORIES.map(c => [c.key, c.icon]))
+const CATEGORY_COLORS = Object.fromEntries(TASK_CATEGORIES.map(c => [c.key, c.color]))
 
-// ─── Urgency scoring ─────────────────────────────────────────────────────────
 function urgencyScore(task) {
   let score = 0
-  const t = (task.title || '').toLowerCase()
-  const now = new Date()
-
-  // Due date urgency
   if (task.dueDate) {
-    const due = new Date(task.dueDate)
-    const daysUntil = (due - now) / (1000 * 60 * 60 * 24)
-    if (daysUntil < 0)       score += 100  // overdue
-    else if (daysUntil < 3)  score += 80
-    else if (daysUntil < 7)  score += 60
-    else if (daysUntil < 14) score += 40
-    else if (daysUntil < 30) score += 20
+    const days = (new Date(task.dueDate) - new Date()) / 86400000
+    if (days < 0)  score += 100
+    else if (days < 7)  score += 60
+    else if (days < 30) score += 20
   }
-
-  // Status boost
   if (task.status === 'In progress' || task.status === 'In Progress') score += 50
-
-  // Keyword urgency
-  if (/confirm|sign|approve|urgent|asap|rush|deadline|overdue|today|this week|by friday|by monday/.test(t)) score += 30
-  if (/draft|finalize|complete|finish|submit|send|review/.test(t)) score += 10
-
+  if (/confirm|sign|approve|urgent|asap|deadline|today|by friday|by monday/.test((task.title || '').toLowerCase())) score += 30
   return score
 }
 
@@ -135,6 +86,14 @@ function groupByCategory(tasks) {
     groups[cat].push(t)
   })
   return groups
+}
+
+const DISMISSED_KEY = 'tcf-dismissed-tasks'
+function getDismissed() {
+  try { return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]')) } catch { return new Set() }
+}
+function saveDismissed(set) {
+  localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]))
 }
 
 // ─── Task dot ───────────────────────────────────────────────────────────────
@@ -324,164 +283,168 @@ const DRIVE_SOURCE_DOCS = [
   { name: 'Action Items – Class & Retail', url: 'https://docs.google.com/document/d/1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw/edit' },
 ]
 
+// ─── Single task row ─────────────────────────────────────────────────────────
+function TaskItem({ task, onDismiss }) {
+  const overdue = task.dueDate && isOverdue(task.dueDate)
+  const inProg  = task.status === 'In progress' || task.status === 'In Progress'
+  return (
+    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#FAFAFA] group border-b border-[#F0F0F0] last:border-0">
+      <div className="w-[7px] h-[7px] rounded-full shrink-0 border"
+        style={{
+          background: overdue ? '#B52B2B' : inProg ? '#0D9E9E' : 'white',
+          borderColor: overdue ? '#B52B2B' : inProg ? '#0D9E9E' : '#CCCCCC',
+        }}
+      />
+      <span className="flex-1 text-[12.5px] text-[#1A1A1A] leading-snug min-w-0 truncate">
+        {task.title}
+      </span>
+      <span className="text-[10px] text-[#AAAAAA] shrink-0 hidden group-hover:inline">
+        {task.sourceName}
+      </span>
+      {overdue && (
+        <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded shrink-0"
+          style={{ background: '#FEE2E2', color: '#B91C1C' }}>overdue</span>
+      )}
+      {task.dueDate && !overdue && (
+        <span className="text-[10px] text-[#AAAAAA] shrink-0">{fmtDateShort(task.dueDate)}</span>
+      )}
+      {task.url && (
+        <a href={task.url} target="_blank" rel="noopener noreferrer"
+          className="text-[11px] text-[#BBBBBB] hover:text-[#0D9E9E] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Open in Drive">↗</a>
+      )}
+      <button
+        onClick={() => onDismiss(task.id)}
+        className="text-[10px] text-[#CCCCCC] hover:text-[#B52B2B] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity leading-none"
+        title="Hide this task">✕</button>
+    </div>
+  )
+}
+
+// ─── Collapsible category section ────────────────────────────────────────────
+function CategorySection({ label, color, tasks, onDismiss, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen)
+  const sorted = [...tasks].sort((a, b) => urgencyScore(b) - urgencyScore(a))
+  return (
+    <div className="border border-[#EEEEEE] rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] transition-colors text-left"
+      >
+        <div className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+        <span className="text-[12px] font-semibold text-[#1A1A1A] flex-1">{label}</span>
+        <span className="text-[11px] text-[#AAAAAA]">{tasks.length}</span>
+        <span className="text-[10px] text-[#BBBBBB] ml-1">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && (
+        <div className="border-t border-[#F0F0F0]">
+          {sorted.map(t => <TaskItem key={t.id} task={t} onDismiss={onDismiss} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function TasksTab() {
   const { state } = useApp()
-  const [filter, setFilter] = useState('all')
   const [showDone, setShowDone] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
 
-  const allActive = (state.tasks || []).filter(t => !t.done && t.status !== 'Done' && t.status !== 'Complete' && t.status !== 'Completed')
+  const [dismissed, setDismissed] = useState(() => getDismissed())
+  const [showDismissed, setShowDismissed] = useState(false)
 
-  const filtered = filter === 'inprogress'
-    ? allActive.filter(t => t.status === 'In progress' || t.status === 'In Progress')
-    : filter === 'notstarted'
-    ? allActive.filter(t => t.status !== 'In progress' && t.status !== 'In Progress')
-    : allActive
+  function handleDismiss(id) {
+    const next = new Set(dismissed)
+    next.add(id)
+    setDismissed(next)
+    saveDismissed(next)
+  }
 
-  const done = (state.tasks || []).filter(t => t.done || t.status === 'Done' || t.status === 'Complete' || t.status === 'Completed')
+  function handleRestore() {
+    const empty = new Set()
+    setDismissed(empty)
+    saveDismissed(empty)
+  }
 
-  // Group by category, sort tasks within each by urgency (highest first)
-  const rawGroups = groupByCategory(filtered)
-  const sortedGroups = Object.fromEntries(
-    Object.entries(rawGroups).map(([cat, tasks]) => [
-      cat,
-      [...tasks].sort((a, b) => urgencyScore(b) - urgencyScore(a)),
-    ])
+  const allTasks   = state.tasks || []
+  const inProgress = allTasks.filter(t =>
+    !dismissed.has(t.id) &&
+    (t.status === 'In progress' || t.status === 'In Progress') &&
+    t.status !== 'Done'
   )
+  const active = allTasks.filter(t =>
+    !dismissed.has(t.id) &&
+    !t.done && t.status !== 'Done' && t.status !== 'Complete' && t.status !== 'Completed' &&
+    t.status !== 'In progress' && t.status !== 'In Progress'
+  )
+  const done = allTasks.filter(t => t.done || t.status === 'Done' || t.status === 'Complete' || t.status === 'Completed')
 
-  // Order categories: categories with any overdue/in-progress tasks first,
-  // then follow CATEGORIES definition order (already priority-ordered)
-  const catMaxScore = cat => Math.max(0, ...(sortedGroups[cat] || []).map(urgencyScore))
-  const orderedCats = CATEGORIES.map(c => c.key)
-    .filter(k => sortedGroups[k]?.length > 0)
-    .sort((a, b) => {
-      // If one has overdue tasks, it wins
-      const aScore = catMaxScore(a)
-      const bScore = catMaxScore(b)
-      if (aScore !== bScore) return bScore - aScore
-      return 0 // preserve definition order when tied
-    })
-
-  // Task counts per source doc (for chips)
-  const sourceCounts = {}
-  allActive.forEach(t => { const n = t.sourceName || 'Other'; sourceCounts[n] = (sourceCounts[n] || 0) + 1 })
+  const groups = groupByCategory(active)
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3" style={{ maxWidth: 760 }}>
 
-      {/* Connected Drive Sources */}
-      <div className="panel p-3">
-        <div className="flex items-center gap-2 mb-2.5">
-          <span className="text-[9.5px] font-bold uppercase tracking-wider text-ink-muted">Connected Google Drive Sources</span>
-          <span className="text-[9px] text-ink-muted">· auto-syncs 4× daily · click any doc to edit directly</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {DRIVE_SOURCE_DOCS.map(doc => (
-            <a key={doc.name} href={doc.url} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border hover:border-teal hover:bg-teal/5 transition-colors group">
-              <span className="text-[11.5px] font-medium text-ink group-hover:text-teal transition-colors">{doc.name}</span>
-              {sourceCounts[doc.name] > 0 && (
-                <span className="text-[9px] bg-teal/10 text-teal px-1.5 py-0.5 rounded-full font-bold">
-                  {sourceCounts[doc.name]}
-                </span>
-              )}
-              <span className="text-[10px] text-ink-muted group-hover:text-teal">↗</span>
-            </a>
+      {/* In Progress — always visible */}
+      {inProgress.length > 0 && (
+        <div className="border border-[#0D9E9E33] rounded-xl overflow-hidden" style={{ background: '#F8FFFE' }}>
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#0D9E9E20]">
+            <div className="w-2 h-2 rounded-full bg-teal animate-pulse" />
+            <span className="text-[11px] font-bold text-teal uppercase tracking-wider">In Progress</span>
+            <span className="text-[10px] text-teal/60 ml-auto">{inProgress.length}</span>
+          </div>
+          {inProgress.sort((a, b) => urgencyScore(b) - urgencyScore(a)).map(t => (
+            <TaskItem key={t.id} task={t} onDismiss={handleDismiss} />
           ))}
         </div>
-      </div>
-
-      {/* Status filter + count */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1 p-1 rounded-lg" style={{ background: '#EEEEEE', width: 'fit-content' }}>
-          {[['all', 'All'], ['inprogress', 'In Progress'], ['notstarted', 'Not Started']].map(([v, label]) => (
-            <button key={v} onClick={() => setFilter(v)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-md transition-all"
-              style={filter === v
-                ? { background: '#FFFFFF', color: '#0D9E9E', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }
-                : { color: '#58595b' }}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <span className="text-[11px] text-ink-muted">{filtered.length} task{filtered.length !== 1 ? 's' : ''}</span>
-      </div>
-
-      {/* Category Sections — ordered by urgency */}
-      {filtered.length === 0 ? (
-        <EmptyState message="No tasks match this filter." />
-      ) : (
-        orderedCats.map(cat => {
-          const tasks = sortedGroups[cat] || []
-          if (tasks.length === 0) return null
-          const color = CATEGORY_COLORS[cat] || '#58595b'
-          const icon  = CATEGORY_ICONS[cat]  || '•'
-          const topScore = catMaxScore(cat)
-          const isUrgent = topScore >= 80
-          return (
-            <div key={cat} className="panel overflow-hidden">
-              <div className="panel-header" style={{
-                background: color + '10',
-                borderBottom: '1px solid ' + color + '25',
-              }}>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px]">{icon}</span>
-                  <span className="text-[11.5px] font-bold" style={{ color }}>{cat}</span>
-                  {isUrgent && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: '#FEE2E2', color: '#B91C1C' }}>URGENT</span>
-                  )}
-                </div>
-                <span className="text-[10.5px] text-ink-muted">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</span>
-              </div>
-              <div className="divide-y divide-border">
-                {tasks.map((t, idx) => {
-                  const score = urgencyScore(t)
-                  const overdue = t.dueDate && isOverdue(t.dueDate)
-                  const inProg  = t.status === 'In progress' || t.status === 'In Progress'
-                  return (
-                    <div key={t.id} className="flex items-start gap-3 px-4 py-2.5 hover:bg-surface2 group transition-colors">
-                      {/* Priority indicator */}
-                      <div className="flex flex-col items-center gap-0.5 shrink-0 mt-[3px]">
-                        <div className="w-2 h-2 rounded-full border"
-                          style={{
-                            background: overdue ? '#B52B2B' : inProg ? color : 'white',
-                            borderColor: overdue ? '#B52B2B' : inProg ? color : '#BBBBBB',
-                          }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[12.5px] text-ink leading-snug">{t.title}</div>
-                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-ink-muted">{t.sourceName}</span>
-                          {inProg && <span className="text-[9px] font-semibold text-teal bg-teal/10 px-1.5 py-0.5 rounded-full">In Progress</span>}
-                          {overdue && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: '#FEE2E2', color: '#B91C1C' }}>Overdue</span>}
-                          {t.dueDate && !overdue && (
-                            <span className="text-[10px]" style={{ color: '#888' }}>· Due {t.dueDate}</span>
-                          )}
-                        </div>
-                      </div>
-                      {t.url && (
-                        <a href={t.url} target="_blank" rel="noopener noreferrer"
-                          className="opacity-0 group-hover:opacity-100 text-[11px] text-teal hover:underline shrink-0 mt-0.5 font-medium transition-opacity"
-                          title={`Open in Drive — ${t.sourceName || ''}`}>↗</a>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })
       )}
 
-      {/* Completed */}
-      <div className="panel p-4" style={{ borderColor: '#D8D8D8' }}>
-        <TaskColumn label="Completed" tasks={done} count={done.length} dim collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
+      {/* Category sections — collapsed by default */}
+      {TASK_CATEGORIES.map(cat => {
+        const tasks = groups[cat.key] || []
+        if (tasks.length === 0) return null
+        return (
+          <CategorySection
+            key={cat.key}
+            label={cat.key}
+            color={cat.color}
+            tasks={tasks}
+            onDismiss={handleDismiss}
+          />
+        )
+      })}
+
+      {/* Footer row: add task + drive sources + restore */}
+      <div className="flex items-center justify-between pt-1">
+        <button className="btn-primary text-xs px-3 py-1.5" onClick={() => setAddOpen(true)}>
+          + Add Task
+        </button>
+        <div className="flex items-center gap-3">
+          {dismissed.size > 0 && (
+            <button onClick={handleRestore}
+              className="text-[10px] text-[#AAAAAA] hover:text-[#58595b] transition-colors">
+              Restore {dismissed.size} hidden
+            </button>
+          )}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[9.5px] text-[#CCCCCC] uppercase tracking-wider">Edit in Drive:</span>
+            {DRIVE_SOURCE_DOCS.map(doc => (
+              <a key={doc.name} href={doc.url} target="_blank" rel="noopener noreferrer"
+                className="text-[10px] text-[#AAAAAA] hover:text-[#0D9E9E] transition-colors">
+                {doc.name.split(' ')[0]} ↗
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div>
-        <button className="btn-primary text-xs px-3 py-2" onClick={() => setAddOpen(true)}>+ Add Task</button>
-      </div>
+      {/* Completed — collapsed */}
+      {done.length > 0 && (
+        <div className="border border-[#EEEEEE] rounded-xl overflow-hidden">
+          <TaskColumn label="Completed" tasks={done} count={done.length} dim
+            collapsed={!showDone} onToggle={() => setShowDone(v => !v)} />
+        </div>
+      )}
+
       {addOpen && <AddTaskModal onClose={() => setAddOpen(false)} />}
     </div>
   )
