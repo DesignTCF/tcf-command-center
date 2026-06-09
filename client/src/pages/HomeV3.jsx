@@ -62,7 +62,7 @@ function Header({ onSync, syncing, syncedAt }) {
     : 'Static data'
 
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEEEEE] bg-white sticky top-0 z-10">
+    <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEEEEE] bg-white mb-1">
       <div>
         <div className="text-[15px] font-semibold text-[#1A1A1A]">{greeting}, Katherine</div>
         <div className="text-[11px] text-[#58595b] mt-0.5">{date} · {time}</div>
@@ -421,10 +421,10 @@ export default function HomeV3() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="page-scroll">
       <Header onSync={handleSync} syncing={state.syncing} syncedAt={state.syncedAt} />
 
-      <div className="flex gap-5 p-6 flex-1" style={{ alignItems: 'flex-start' }}>
+      <div className="flex gap-5 pt-5" style={{ alignItems: 'flex-start' }}>
 
         {/* ── LEFT: main content ── */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
