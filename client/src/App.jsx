@@ -11,7 +11,7 @@ const TABS = [
   { id: 'overview',  label: 'Overview',              icon: LayoutDashboard, Comp: Overview },
   { id: 'tasks',     label: 'Tasks & To-Dos',        icon: CheckSquare,     Comp: Tasks },
   { id: 'calendar',  label: 'Calendar',              icon: CalendarDays,    Comp: Calendar },
-  { id: 'inventory', label: 'Inventory & Purchasing', icon: Package,        Comp: Inventory },
+  { id: 'inventory', label: 'Sourcing',                icon: Package,        Comp: Inventory },
 ]
 
 function UpdateButton() {

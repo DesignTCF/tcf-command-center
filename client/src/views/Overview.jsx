@@ -94,7 +94,7 @@ export default function Overview({ onNavigate }) {
         <SectionCard
           title="Incoming orders & samples"
           count={incoming.length}
-          right={<button onClick={() => onNavigate('inventory')} className="btn-ghost text-xs">Inventory <ArrowRight size={13} /></button>}
+          right={<button onClick={() => onNavigate('inventory')} className="btn-ghost text-xs">Sourcing <ArrowRight size={13} /></button>}
         >
           {incoming.length === 0 && <EmptyState>Nothing currently in transit.</EmptyState>}
           <ul className="divide-y divide-border">
