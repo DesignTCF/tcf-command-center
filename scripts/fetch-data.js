@@ -106,7 +106,7 @@ function parseDocTasks(text, sourceName, sourceUrl) {
     if (!line || !hasWord(line)) continue                  // blank or decoration
     if (line.toUpperCase() === titleUpper) continue        // the doc's own title
 
-    // Checkbox item: [ ] / [x]
+    // Checkbox item: [ ] / [x] — always a real task.
     let m = line.match(/^[\*\-•]?\s*\[([xX ]?)\]\s+(.+)$/)
     if (m) {
       const title = m[2].trim()
@@ -114,8 +114,12 @@ function parseDocTasks(text, sourceName, sourceUrl) {
       continue
     }
 
-    // Bullet item: * / - / •
-    m = line.match(/^[\*\-•]\s+(.+)$/)
+    // Reference bullet (•) — informational note (supplier specs, pricing, etc.),
+    // NOT a to-do in Katherine's docs. Skip it entirely.
+    if (/^•\s+/.test(line)) continue
+
+    // Task bullet: * / -
+    m = line.match(/^[\*\-]\s+(.+)$/)
     if (m) {
       const content = m[1].trim()
       if (isSubPoint(content)) {                            // sub-point → detail of previous task
@@ -143,7 +147,9 @@ function parseDocTasks(text, sourceName, sourceUrl) {
     }
 
     // Otherwise: a short line is a section header → group context; long prose is ignored.
-    if (line.length <= 60) { group = line.replace(/^#+\s*/, '').trim(); last = null }
+    // Guard: don't treat spec/pricing/data lines (prices, sizes, "Note:") as headers.
+    const looksLikeData = /[$|]|\b\d+\s?(oz|ml|units?|each|mm|ct)\b|^note[:\s]/i.test(line)
+    if (line.length <= 60 && !looksLikeData) { group = line.replace(/^#+\s*/, '').trim(); last = null }
   }
   return tasks
 }
