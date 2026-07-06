@@ -1,0 +1,77 @@
+{
+  "events": [
+    {
+      "start": "2026-07-03",
+      "end": "2026-07-06",
+      "id": "6q8r4d8ul7sa17ag2smuamv27s@google.com",
+      "title": "4th of July",
+      "date": "2026-07-03",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-07-17",
+      "end": "2026-07-20",
+      "id": "2v3ltfjn8kgplaenuu2gdhhv30@google.com",
+      "title": "NM PTO",
+      "date": "2026-07-17",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-07-24",
+      "end": "2026-07-27",
+      "id": "6j42fk68t7dloemncebaigm21c@google.com",
+      "title": "NM PTO",
+      "date": "2026-07-24",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-07-30",
+      "end": "2026-08-03",
+      "id": "49c79iuq7va8ipelc99hcl7pfa@google.com",
+      "title": "KF PTO",
+      "date": "2026-07-30",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-10-05",
+      "end": "2026-10-10",
+      "id": "7gihefh2pfvnrno6sdu109o5l9@google.com",
+      "title": "RK PTO",
+      "date": "2026-10-05",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-10-10",
+      "end": "2026-10-13",
+      "id": "2aercoqqj3jt1uk31vl630niam@google.com",
+      "title": "Columbus Day",
+      "date": "2026-10-10",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-11-26",
+      "end": "2026-11-30",
+      "id": "35codu0agu8h27aoumm41o7j05@google.com",
+      "title": "Thanksgiving",
+      "date": "2026-11-26",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    },
+    {
+      "start": "2026-12-24",
+      "end": "2026-12-29",
+      "id": "6qbk39es2leploj76u2r08q4j5@google.com",
+      "title": "Christmas",
+      "date": "2026-12-24",
+      "calendarName": "The Cosmetic Formulary Operations",
+      "color": "#0D9E9E"
+    }
+  ],
+  "fetchedAt": "2026-07-06T18:26:50.531Z"
+}

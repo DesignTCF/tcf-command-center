@@ -1,0 +1,14 @@
+{
+  "name": "tcf-command-center",
+  "version": "2.0.0",
+  "private": true,
+  "description": "TCF Command Center — operations dashboard (live from Google Drive, Calendar, Supplier Tracker)",
+  "scripts": {
+    "fetch": "node scripts/fetch-data.js",
+    "generate": "node scripts/generate-static-data.js",
+    "refresh": "node scripts/fetch-data.js && node scripts/generate-static-data.js"
+  },
+  "dependencies": {
+    "xlsx": "0.18.5"
+  }
+}

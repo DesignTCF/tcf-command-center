@@ -1,0 +1,9 @@
+node_modules/
+.env
+data/drive-tokens.json
+data/gmail-tokens.json
+client-dist/
+client-dist-gh/
+.DS_Store
+*.log
+.vite/

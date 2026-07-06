@@ -1,0 +1,69 @@
+name: Refresh Data & Deploy
+
+on:
+  schedule:
+    # Auto-refresh at 6am, 11am, 3pm, 8pm EST (11, 16, 20, 01 UTC)
+    - cron: '0 11 * * *'
+    - cron: '0 16 * * *'
+    - cron: '0 20 * * *'
+    - cron: '0 1 * * *'
+  workflow_dispatch: # "Update Now" button + manual runs from the Actions tab
+
+concurrency:
+  group: refresh-deploy
+  cancel-in-progress: false
+
+jobs:
+  refresh-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install root deps (spreadsheet parser)
+        run: npm install --no-audit --no-fund
+
+      - name: Fetch fresh data (Drive, Calendar, Supplier Tracker)
+        env:
+          KATHERINE_REFRESH_TOKEN: ${{ secrets.KATHERINE_REFRESH_TOKEN }}
+          DRIVE_REFRESH_TOKEN: ${{ secrets.DRIVE_REFRESH_TOKEN }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+        run: node scripts/fetch-data.js
+
+      - name: Bake data into the app
+        run: node scripts/generate-static-data.js
+
+      - name: Install client deps
+        run: cd client && npm install --no-audit --no-fund
+
+      - name: Build for GitHub Pages
+        env:
+          GH_PAGES: 'true'
+          VITE_GH_TOKEN: ${{ secrets.VITE_GH_TOKEN }}
+        run: cd client && npm run build
+
+      - name: Deploy to gh-pages
+        run: |
+          git config user.name "TCF Bot"
+          git config user.email "design@thecosmeticformulary.com"
+          mkdir -p /tmp/gh-deploy
+          cp -r client-dist-gh/. /tmp/gh-deploy/
+          cp client-dist-gh/index.html /tmp/gh-deploy/404.html
+          touch /tmp/gh-deploy/.nojekyll
+          git fetch origin gh-pages || true
+          git stash --include-untracked || true
+          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+          find . -maxdepth 1 ! -name .git ! -name . -exec rm -rf {} +
+          cp -r /tmp/gh-deploy/. .
+          git add -A
+          git diff --cached --quiet || git commit -m "Auto refresh: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push origin gh-pages
