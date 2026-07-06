@@ -81,4 +81,29 @@ export function inventoryStats(inventory) {
   return { incomingOrders, incomingSamples, followUps, delivered, planned, active, followUpRows }
 }
 
+// Items that are on their way / in progress (not yet delivered) — the "upcoming"
+// side of purchasing. Sorted by expected arrival when available.
+export function incomingItems(inventory) {
+  const out = []
+  for (const tab of inventory?.tabs || []) {
+    for (const row of tab.rows || []) {
+      const blob = Object.entries(row).filter(([k]) => /status/i.test(k)).map(([, v]) => String(v).toLowerCase()).join(' ')
+      if (!blob.trim()) continue
+      if (/deliver|received|complete|not moving|cancel/.test(blob)) continue
+      if (!/shipped|transit|ordered|production|requested|incoming|processing|paid/.test(blob)) continue
+      out.push({
+        name: row['Supplier / Company'] || row['Brand'] || row['Item Ordered'] || 'Item',
+        item: row['Item Ordered'] || row['Product / Component'] || row['Product / Description'] || '',
+        tab: tab.label,
+        status: row[tab.statusKey] || '',
+        eta: row['Expected Arrival'] || '',
+      })
+    }
+  }
+  return out.sort((a, b) => {
+    if (a.eta && b.eta) return String(a.eta).localeCompare(String(b.eta))
+    return a.eta ? -1 : b.eta ? 1 : 0
+  })
+}
+
 export { statusTone, daysUntil }

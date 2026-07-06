@@ -384,6 +384,17 @@
           "Tracking Number": "",
           "Status": "In Conversation",
           "Notes / Testing Feedback": ""
+        },
+        {
+          "Supplier / Company": "Shenzhen Yayue Chemical Co., Ltd.",
+          "Contact Person": "Li Jocelyn",
+          "Sample Type": "Accessories/brushes",
+          "Product / Description": "",
+          "Date Requested": "",
+          "Sample Cost": "",
+          "Tracking Number": "",
+          "Status": "In Conversation",
+          "Notes / Testing Feedback": ""
         }
       ]
     },
@@ -443,9 +454,22 @@
           "Follow-Up Date": "",
           "Priority": "",
           "Notes": ""
+        },
+        {
+          "Supplier / Company": "Shenzhen Yayue Chemical Co., Ltd.",
+          "Contact Person": "Li Jocelyn",
+          "Product Offered": "Detangling brush, scalp massager, bauety blender, loufa",
+          "Category": "Accessories",
+          "Pricing / MOQ Info": "",
+          "Samples Available?": "",
+          "Conversation Status": "In Conversation",
+          "Next Step": "",
+          "Follow-Up Date": "",
+          "Priority": "",
+          "Notes": ""
         }
       ]
     }
   ],
-  "fetchedAt": "2026-07-06T18:26:51.337Z"
+  "fetchedAt": "2026-07-06T18:39:31.607Z"
 }

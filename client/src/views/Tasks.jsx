@@ -7,14 +7,27 @@ import { Chip, StatCard, SectionCard, EmptyState } from '../components/ui.jsx'
 
 function TaskRow({ t }) {
   return (
-    <li className="flex items-start gap-3 px-4 py-2.5 border-t border-border/70 first:border-t-0">
+    <li className="group flex items-start gap-3 px-4 py-2.5 border-t border-border/70 first:border-t-0 hover:bg-surface2/50">
       <span className={`mt-1 w-3.5 h-3.5 rounded-full shrink-0 border-2 ${t.done ? 'bg-green border-green' : 'border-border2'}`} />
       <div className="min-w-0 flex-1">
-        <p className={`text-sm leading-snug ${t.done ? 'line-through text-ink-muted' : 'text-ink'}`}>{t.title}</p>
+        <a
+          href={t.url}
+          target="_blank"
+          rel="noreferrer"
+          className={`text-sm leading-snug inline-flex items-start gap-1 hover:text-teal-dim hover:underline ${t.done ? 'line-through text-ink-muted' : 'text-ink'}`}
+        >
+          {t.title}
+          <ExternalLink size={12} className="mt-0.5 shrink-0 opacity-0 group-hover:opacity-60" />
+        </a>
+        {t.details?.length > 0 && (
+          <ul className="mt-1 ml-1 space-y-0.5">
+            {t.details.map((d, i) => (
+              <li key={i} className="text-xs text-ink-muted flex gap-1.5"><span className="text-border2">→</span>{d}</li>
+            ))}
+          </ul>
+        )}
         <div className="mt-1 flex flex-wrap items-center gap-1.5">
-          {t.group && t.group !== t.sourceName && (
-            <span className="text-2xs text-ink-muted">{t.group}</span>
-          )}
+          {t.group && <span className="text-2xs font-medium text-ink-muted uppercase tracking-wide">{t.group}</span>}
           {t.priority && <Chip tone={priorityTone(t.priority)}>{t.priority}</Chip>}
           {t.dueDate && <span className="text-2xs text-ink-muted">Due {fmtDate(t.dueDate)}</span>}
           {t.assignee && <span className="text-2xs text-ink-muted">· {t.assignee}</span>}

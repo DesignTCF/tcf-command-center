@@ -90,34 +90,60 @@ async function accessTokenFor(account) {
 }
 
 // ── Task parsers ──────────────────────────────────────────────────────────────
-function parseDocTasks(text, sourceName, sourceUrl, opts = {}) {
+const hasWord = (s) => /[a-z0-9]/i.test(s)                 // real content vs pure decoration
+const isSubPoint = (s) => /^[→▶▸►▪◦·➤➔]/.test(s)          // arrow/dot lead = detail of the task above
+
+// Parse a to-do doc: ALL-CAPS / short lines become section context (group),
+// bullets & numbered lines become tasks, and arrow sub-points (→ …) attach to
+// the task above them as details rather than becoming their own tasks.
+function parseDocTasks(text, sourceName, sourceUrl) {
   const tasks = []
-  let group = sourceName, id = 0
-  const hasWord = (s) => /[a-z0-9]/i.test(s)          // real content vs pure decoration
+  let group = null, id = 0, last = null
+  const titleUpper = sourceName.toUpperCase()
+
   for (const raw of text.split('\n')) {
-    const line = raw.trim()
-    if (!line) continue
-    // Skip separator / decoration lines (———, ━━━, ***, ___, • • •, etc.)
-    if (!hasWord(line)) continue
-    if (!line.startsWith('*') && !line.startsWith('-') && !line.match(/^\[/) && !line.match(/^\d+\./) && line.length < 80 && line.length > 2) {
-      group = line.replace(/^#+\s*/, '').trim(); continue
-    }
-    const check = line.match(/^[\*\-]?\s*\[([xX ]?)\]\s+(.+)$/)
-    if (check) {
-      const title = check[2].trim(); if (title.length < 3 || !hasWord(title)) continue
-      tasks.push(mkTask(++id, sourceName, title, check[1].toLowerCase() === 'x', group, sourceUrl))
+    const line = raw.replace(/﻿/g, '').trim()
+    if (!line || !hasWord(line)) continue                  // blank or decoration
+    if (line.toUpperCase() === titleUpper) continue        // the doc's own title
+
+    // Checkbox item: [ ] / [x]
+    let m = line.match(/^[\*\-•]?\s*\[([xX ]?)\]\s+(.+)$/)
+    if (m) {
+      const title = m[2].trim()
+      if (title.length >= 3 && hasWord(title)) { last = mkTask(++id, sourceName, title, m[1].toLowerCase() === 'x', group, sourceUrl); tasks.push(last) }
       continue
     }
-    const num = line.match(/^(\d+)\.\s+(.+)$/)
-    if (num) {
-      const title = num[2].replace(/\(.*?\)/g, '').trim(); if (title.length < 3 || !hasWord(title)) continue
-      tasks.push(mkTask(++id, sourceName, title, false, group, sourceUrl))
+
+    // Bullet item: * / - / •
+    m = line.match(/^[\*\-•]\s+(.+)$/)
+    if (m) {
+      const content = m[1].trim()
+      if (isSubPoint(content)) {                            // sub-point → detail of previous task
+        const detail = content.replace(/^[→▶▸►▪◦·➤➔]+\s*/, '').trim()
+        if (last && detail) (last.details = last.details || []).push(detail)
+        continue
+      }
+      if (content.length >= 3 && hasWord(content)) { last = mkTask(++id, sourceName, content, false, group, sourceUrl); tasks.push(last) }
       continue
     }
-    if (opts.bullets) {
-      const b = line.match(/^[\*\-•]\s+(.+)$/)
-      if (b) { const title = b[1].trim(); if (title.length >= 3 && hasWord(title)) tasks.push(mkTask(++id, sourceName, title, false, group, sourceUrl)) }
+
+    // Numbered item: 1. / 1)
+    m = line.match(/^(\d+)[.)]\s+(.+)$/)
+    if (m) {
+      const title = m[2].replace(/\(.*?\)/g, '').trim()
+      if (title.length >= 3 && hasWord(title)) { last = mkTask(++id, sourceName, title, false, group, sourceUrl); tasks.push(last) }
+      continue
     }
+
+    // Standalone arrow line (no bullet) → detail of previous task
+    if (isSubPoint(line)) {
+      const detail = line.replace(/^[→▶▸►▪◦·➤➔]+\s*/, '').trim()
+      if (last && detail) (last.details = last.details || []).push(detail)
+      continue
+    }
+
+    // Otherwise: a short line is a section header → group context; long prose is ignored.
+    if (line.length <= 60) { group = line.replace(/^#+\s*/, '').trim(); last = null }
   }
   return tasks
 }
@@ -126,7 +152,8 @@ function mkTask(id, sourceName, title, done, group, url) {
   return {
     id: `t-${sourceName.replace(/\s+/g, '-').toLowerCase()}-${id}`,
     title, done, status: done ? 'Done' : 'Open',
-    group, sourceName, url, dueDate: null,
+    group: group && group !== sourceName ? group : null,
+    sourceName, url, dueDate: null, details: undefined,
   }
 }
 
@@ -154,37 +181,53 @@ function parseSheetTasks(csv, sourceName, sourceUrl) {
   return tasks
 }
 
-// ── Task sources (katherine@ = primary, listed first) ─────────────────────────
-const TASK_SOURCES = [
-  { account: KATHERINE, id: '1hyIDLZy0xdi6YfX4qeN_we5e_QVHy2xomYyPpCRBVro', name: 'TCF Master To-Do List',      type: 'doc' },
-  { account: KATHERINE, id: '1h1m6ytLxv5VG9NIrJ-jDcyi2wSFstw_lqKctVzk6Xmw', name: 'NeVoo Action Items',         type: 'doc' },
-  { account: KATHERINE, id: '12uUjdVpARzVySj1x7r0T7bilTqzlD6_lgMfHG4fS-wk', name: 'Sip & Formulate + Salt Spa', type: 'doc' },
-  { account: DESIGN,    id: '1ofvcpceHYsEt7I-dwZXA78YycDH0WsdhlbUVlI0lYJA', name: 'TCF to-do List',             type: 'doc', bullets: true },
-  { account: DESIGN,    id: '1iPMeoBklpr90wV553ZGnYCsKqsmk4Jb9ww6kK-TXGjI', name: 'Salt Spa Action Items',      type: 'sheet' },
-  { account: DESIGN,    id: '1IU3mAtJVSA1wO_xK8-3jwPlHxEe8xNWPruZgFvbXLcw', name: 'Action Items – Class & Retail', type: 'doc' },
-]
+// ── Tasks: read every doc/sheet in katherine@'s "To Do lists" folder ──────────
+// Whatever lives in this folder is what shows on the dashboard — add/remove a
+// list in Drive and the dashboard follows. No hardcoded document list.
+const TODO_FOLDER_ID = '1DXnEI4EXPKkuOxoCX0qkmwocH6dj26Pr'
+// Preferred display order (by title); anything else falls in after, alphabetically.
+const TASK_DOC_ORDER = ['THE COSMETIC FORMULARY — MASTER TO-DO LIST', 'NEVOO', 'SIP & FORMULATE + SALT SPA & YOGA']
 
 function docUrl(id) { return `https://docs.google.com/document/d/${id}/edit` }
 function sheetUrl(id) { return `https://docs.google.com/spreadsheets/d/${id}/edit` }
 
+async function listFolder(token, folderId) {
+  const q = encodeURIComponent(`'${folderId}' in parents and trashed = false`)
+  const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,mimeType,modifiedTime)&pageSize=100`
+  const res = await httpGet(url, { Authorization: `Bearer ${token}` })
+  return JSON.parse(res).files || []
+}
+
 async function fetchTasks() {
-  const all = []
-  for (const s of TASK_SOURCES) {
-    try {
-      const token = await accessTokenFor(s.account)
-      if (!token) { log(`⚠ no token for ${s.account} — skip "${s.name}"`); continue }
-      const mime = s.type === 'sheet' ? 'text/csv' : 'text/plain'
-      const url = `https://www.googleapis.com/drive/v3/files/${s.id}/export?mimeType=${encodeURIComponent(mime)}`
-      const content = await httpGet(url, { Authorization: `Bearer ${token}` })
-      const tasks = s.type === 'sheet'
-        ? parseSheetTasks(content, s.name, sheetUrl(s.id))
-        : parseDocTasks(content, s.name, docUrl(s.id), { bullets: !!s.bullets })
-      all.push(...tasks)
-      log(`✓ tasks "${s.name}": ${tasks.length}`)
-    } catch (e) { log(`✗ tasks "${s.name}": ${e.message}`) }
-  }
-  write('tasks.json', all)
-  log(`✓ tasks total: ${all.length}`)
+  try {
+    const token = await accessTokenFor(KATHERINE)
+    if (!token) { log('⚠ no katherine@ token — skip tasks'); write('tasks.json', []); return }
+
+    let files = await listFolder(token, TODO_FOLDER_ID)
+    files = files
+      .filter(f => f.mimeType === 'application/vnd.google-apps.document' || f.mimeType === 'application/vnd.google-apps.spreadsheet')
+      .sort((a, b) => {
+        const ia = TASK_DOC_ORDER.indexOf(a.name), ib = TASK_DOC_ORDER.indexOf(b.name)
+        if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
+        return a.name.localeCompare(b.name)
+      })
+
+    const all = []
+    for (const f of files) {
+      try {
+        const isSheet = f.mimeType === 'application/vnd.google-apps.spreadsheet'
+        const mime = isSheet ? 'text/csv' : 'text/plain'
+        const url = `https://www.googleapis.com/drive/v3/files/${f.id}/export?mimeType=${encodeURIComponent(mime)}`
+        const content = await httpGet(url, { Authorization: `Bearer ${token}` })
+        const fileUrl = isSheet ? sheetUrl(f.id) : docUrl(f.id)
+        const tasks = isSheet ? parseSheetTasks(content, f.name, fileUrl) : parseDocTasks(content, f.name, fileUrl)
+        all.push(...tasks.map(t => ({ ...t, modifiedTime: f.modifiedTime })))
+        log(`✓ "${f.name}": ${tasks.length}`)
+      } catch (e) { log(`✗ "${f.name}": ${e.message}`) }
+    }
+    write('tasks.json', all)
+    log(`✓ tasks total: ${all.length} from ${files.length} docs`)
+  } catch (e) { log(`✗ tasks: ${e.message}`) }
 }
 
 // ── Google Calendar (iCal) ────────────────────────────────────────────────────
