@@ -106,4 +106,34 @@ export function incomingItems(inventory) {
   })
 }
 
+// ── Clients / product pipeline ────────────────────────────────────────────────
+export const STAGE_ORDER = ['Formula', 'Bottle', 'Artwork', 'Bottle Print', 'Box Print']
+
+export function productProgress(p) {
+  const stages = STAGE_ORDER.map(k => ({ key: k, status: p.stages?.[k] || '' }))
+  const filled = stages.filter(s => s.status)
+  const done = filled.filter(s => /complet|deliver|receiv|approved|done/i.test(s.status))
+  return { stages, doneCount: done.length, total: filled.length, pct: filled.length ? Math.round((done.length / filled.length) * 100) : 0 }
+}
+
+export function clientsByBrand(clients) {
+  const map = new Map()
+  for (const p of clients?.products || []) {
+    if (!map.has(p.brand)) map.set(p.brand, [])
+    map.get(p.brand).push(p)
+  }
+  return [...map.entries()].map(([brand, products]) => ({ brand, client: products.find(p => p.client)?.client || '', products }))
+}
+
+export function clientStats(clients) {
+  const products = clients?.products || []
+  let ready = 0, inDev = 0
+  for (const p of products) {
+    const pr = productProgress(p)
+    if (pr.total && pr.doneCount === pr.total) ready++
+    else inDev++
+  }
+  return { total: products.length, ready, inDev, brands: new Set(products.map(p => p.brand)).size }
+}
+
 export { statusTone, daysUntil }

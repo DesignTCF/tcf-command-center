@@ -19,6 +19,7 @@ export function AppProvider({ children }) {
     tasks: staticData.tasks || [],
     calendar: staticData.calendar || [],
     inventory: staticData.inventory || { tabs: [] },
+    clients: staticData.clients || { products: [] },
     generatedAt: staticData.generatedAt || null,
   }), [])
 

@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { LayoutDashboard, CheckSquare, CalendarDays, Package, RefreshCw, Check, AlertCircle } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, CalendarDays, Package, Layers, RefreshCw, Check, AlertCircle } from 'lucide-react'
 import { useApp } from './store/AppContext.jsx'
 import { relativeTime } from './lib/utils.js'
 import Overview from './views/Overview.jsx'
 import Tasks from './views/Tasks.jsx'
 import Calendar from './views/Calendar.jsx'
 import Inventory from './views/Inventory.jsx'
+import Clients from './views/Clients.jsx'
 
 const TABS = [
   { id: 'overview',  label: 'Overview',              icon: LayoutDashboard, Comp: Overview },
   { id: 'tasks',     label: 'Tasks & To-Dos',        icon: CheckSquare,     Comp: Tasks },
+  { id: 'clients',   label: 'Client Progress',       icon: Layers,          Comp: Clients },
   { id: 'calendar',  label: 'Calendar',              icon: CalendarDays,    Comp: Calendar },
-  { id: 'inventory', label: 'Sourcing',                icon: Package,        Comp: Inventory },
+  { id: 'inventory', label: 'Sourcing',              icon: Package,         Comp: Inventory },
 ]
 
 function UpdateButton() {

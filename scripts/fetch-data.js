@@ -348,10 +348,96 @@ async function fetchSupplierTracker() {
   } catch (e) { log(`✗ Supplier Tracker: ${e.message}`) }
 }
 
+// ── Client Status Tracker (Client Progress) ───────────────────────────────────
+// "Client Status Tracker.xlsx" — Products tab uses a two-row merged header
+// (Formulation / Bottle / Art Work / Print groups). We map columns by header
+// text so it survives column shuffles, then read each product's stage statuses.
+const CLIENT_TRACKER_ID = '1hrnC8aDPM7fxZv1YygPgg4-JjDIZAkk9'
+
+function fillHeaders(row) {                                 // forward-fill merged group cells
+  const out = []; let last = ''
+  for (let i = 0; i < row.length; i++) {
+    const v = String(row[i] || '').replace(/\n/g, ' ').trim()
+    if (v) last = v
+    out[i] = last
+  }
+  return out
+}
+
+async function fetchClientTracker() {
+  try {
+    const token = await accessTokenFor(KATHERINE)
+    if (!token) { log('⚠ no katherine@ token — skip Client Tracker'); return }
+    const url = `https://www.googleapis.com/drive/v3/files/${CLIENT_TRACKER_ID}?alt=media&supportsAllDrives=true`
+    const buf = await httpGet(url, { Authorization: `Bearer ${token}` }, true)
+    const wb = XLSX.read(buf, { type: 'buffer' })
+    const ws = wb.Sheets['Products']
+    if (!ws) { log('⚠ Client Tracker: Products tab missing'); return }
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+    if (rows.length < 3) { write('clients.json', { products: [], fetchedAt: new Date().toISOString() }); return }
+
+    const g = fillHeaders(rows[0])
+    const s = (rows[1] || []).map(v => String(v || '').replace(/\n/g, ' ').trim())
+    const n = Math.max(g.length, s.length)
+    const find = (gp, sp) => { for (let i = 0; i < n; i++) { if (gp(g[i] || '') && (sp ? sp(s[i] || '') : true)) return i } return -1 }
+    const col = {
+      brand: find(x => x === 'Brand'),
+      client: find(x => x === 'Client'),
+      type: find(x => x === 'Product Type'),
+      name: find(x => x === 'Product Name'),
+      size: find(x => /^Size/.test(x)),
+      upc: find(x => x === 'UPC'),
+      bottleType: find(x => x === 'Bottle', y => /Bottle Type/.test(y)),
+      bottleSupplier: find(x => x === 'Bottle', y => /Supplier/.test(y)),
+      formula: find(x => x === 'Formulation', y => y === 'Status'),
+      bottle: find(x => x === 'Bottle', y => y === 'Status'),
+      artwork: find(x => /Art\s*Work/i.test(x), y => y === 'Status'),
+      bottlePrint: find(x => /Bottle Print/i.test(x), y => y === 'Status'),
+      boxPrint: find(x => /Box Print/i.test(x), y => y === 'Status'),
+    }
+    const val = (r, i) => (i >= 0 ? String(r[i] || '').replace(/\n/g, ' ').trim() : '')
+
+    const products = []
+    let lastBrand = '', lastClient = ''
+    for (let ri = 2; ri < rows.length; ri++) {
+      const r = rows[ri]
+      const name = val(r, col.name)
+      if (name.length < 2) continue
+      const brand = val(r, col.brand) || lastBrand
+      const client = val(r, col.client) || lastClient
+      if (brand) lastBrand = brand
+      if (client) lastClient = client
+      products.push({
+        brand: brand || '(Unassigned)',
+        client,
+        productType: val(r, col.type),
+        name,
+        size: val(r, col.size),
+        upc: val(r, col.upc),
+        bottleType: val(r, col.bottleType),
+        bottleSupplier: val(r, col.bottleSupplier),
+        stages: {
+          Formula: val(r, col.formula),
+          Bottle: val(r, col.bottle),
+          Artwork: val(r, col.artwork),
+          'Bottle Print': val(r, col.bottlePrint),
+          'Box Print': val(r, col.boxPrint),
+        },
+      })
+    }
+    write('clients.json', {
+      trackerUrl: `https://drive.google.com/file/d/${CLIENT_TRACKER_ID}/view`,
+      products,
+      fetchedAt: new Date().toISOString(),
+    })
+    log(`✓ Client Tracker: ${products.length} products`)
+  } catch (e) { log(`✗ Client Tracker: ${e.message}`) }
+}
+
 // ── Run ───────────────────────────────────────────────────────────────────────
 async function main() {
   log('Starting refresh…')
-  await Promise.all([fetchTasks(), fetchCalendar(), fetchSupplierTracker()])
+  await Promise.all([fetchTasks(), fetchCalendar(), fetchSupplierTracker(), fetchClientTracker()])
   log('Done.')
 }
 main().catch(e => { console.error(e); process.exit(1) })

@@ -1,0 +1,125 @@
+{
+  "trackerUrl": "https://drive.google.com/file/d/1hrnC8aDPM7fxZv1YygPgg4-JjDIZAkk9/view",
+  "products": [
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "Scalp Scrub",
+      "name": "Reset: Micro-Exfoliant Scalp Scrub",
+      "size": "8oz - Retail",
+      "upc": "860014943805",
+      "bottleType": "LDPE Boston Round",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Ordered",
+        "Artwork": "Completed",
+        "Bottle Print": "Print Samples",
+        "Box Print": ""
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "SPF-50 Mineral Sunscreen",
+      "name": "Daily Mineral Sheer SPF 50",
+      "size": "",
+      "upc": "",
+      "bottleType": "Airless Cintainer",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "SPF-50 Tinted Mineral Sunscreen",
+      "name": "Daily Mineral Tinted SPF 50",
+      "size": "",
+      "upc": "",
+      "bottleType": "Airless Cintainer",
+      "bottleSupplier": "",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "THD 30% Serum",
+      "name": "Essential C",
+      "size": "1oz - Retail",
+      "upc": "",
+      "bottleType": "Black glass",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "Cream Cleanser",
+      "name": "Hydrating Cream Cleanser",
+      "size": "6oz - Retail",
+      "upc": "",
+      "bottleType": "Black Glass",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "Oil Cleanser",
+      "name": "Gentle Cleansing Oil",
+      "size": "4oz - Retail",
+      "upc": "",
+      "bottleType": "Black Glass",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    },
+    {
+      "brand": "NeVoo",
+      "client": "Molly Smith",
+      "productType": "Gel Cleanser",
+      "name": "Brightening Cleansing Gel",
+      "size": "6oz - Retail",
+      "upc": "",
+      "bottleType": "Black Glass",
+      "bottleSupplier": "Chunbai (Doria Wang)",
+      "stages": {
+        "Formula": "Completed",
+        "Bottle": "Delivered",
+        "Artwork": "Completed",
+        "Bottle Print": "Completed/Order Recieved",
+        "Box Print": "Completed/Order Recieved"
+      }
+    }
+  ],
+  "fetchedAt": "2026-07-08T14:18:54.785Z"
+}
